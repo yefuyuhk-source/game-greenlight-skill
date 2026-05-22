@@ -70,14 +70,25 @@
 ## M7 报告汇总
 
 1. 汇总 M1-M6 关键结论到 `report/report.md`，作为立项报告。在「关键画面与提示词」章节使用 `{{SHOT_CARDS}}` 占位符。
-2. 运行 `scripts/build_huashu_brief.py` 生成 HTML 设计 brief：
+2. 检测 HTML 设计后端：
+   ```bash
+   python scripts/check_design_backend.py --json
+   ```
+3. 如果检测到 huashu-design，运行 `scripts/build_huashu_brief.py` 生成 HTML 设计 brief：
    ```bash
    python scripts/build_huashu_brief.py <project_dir>
    ```
-3. 调用 huashu-design skill 读取 `report/huashu_design_brief.md`、`report/report.md`、`images/prompts.jsonl` 和已生成图片，设计并产出 `report/report.html`。
-4. 如果当前环境无法调用 huashu-design，才使用 `scripts/md_to_html.py` 做兜底转换，并在对话中说明“HTML 为兜底版，非 huashu-design 定制版”。
-5. 若联网失败降级，报告封面必须提示证据不足。
-6. 对话中返回 `report/report.md`、`report/report.html`、`report/huashu_design_brief.md` 与 `project_state.json` 的路径。
+4. 调用 huashu-design skill 读取 `report/huashu_design_brief.md`、`report/report.md`、`images/prompts.jsonl` 和已生成图片，设计并产出 `report/report.html`。
+5. 如果当前环境没有 huashu-design，使用内置兜底转换：
+   ```bash
+   python scripts/md_to_html.py report/report.md report/report.html \
+     --style auto \
+     --state project_state.json \
+     --prompts images/prompts.jsonl
+   ```
+   兜底 HTML 必须使用结构化卡片式布局，尽量把长文本拆成可读模块，并在对话中说明“HTML 为结构化兜底版，非 huashu-design 定制版”。
+6. 若联网失败降级，报告封面必须提示证据不足。
+7. 对话中返回 `report/report.md`、`report/report.html`、可选 `report/huashu_design_brief.md` 与 `project_state.json` 的路径。
 
 ## M8 风格迭代
 

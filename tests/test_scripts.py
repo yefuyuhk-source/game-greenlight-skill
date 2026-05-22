@@ -168,6 +168,31 @@ class ScriptTests(unittest.TestCase):
             self.assertIn("只保留项目名称", brief)
             self.assertIn("诡街守夜人", brief)
 
+    def test_check_design_backend_fallback_with_empty_home(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            result = subprocess.run(
+                [PYTHON, "scripts/check_design_backend.py", "--json"],
+                cwd=ROOT,
+                check=True,
+                text=True,
+                capture_output=True,
+                env={"HOME": tmp},
+            )
+            data = json.loads(result.stdout)
+            self.assertEqual(data["backend"], "structured-html")
+            self.assertFalse(data["huashu_design_available"])
+
+    def test_check_design_backend_extra_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "skills"
+            skill = root / "huashu-design"
+            skill.mkdir(parents=True)
+            (skill / "SKILL.md").write_text("---\nname: huashu-design\n---\n", encoding="utf-8")
+            result = self.run_script("scripts/check_design_backend.py", "--json", "--root", str(root))
+            data = json.loads(result.stdout)
+            self.assertEqual(data["backend"], "huashu-design")
+            self.assertTrue(data["skill_path"].endswith("huashu-design/SKILL.md"))
+
 
 if __name__ == "__main__":
     unittest.main()

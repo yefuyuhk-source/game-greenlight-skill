@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Markdown 到 HTML 报告转换器。
+"""Markdown 到 HTML 报告兜底转换器。
 
-根据游戏类型匹配 huashu-design 设计风格，动态生成 CSS。
-使用 --style <name> 选择风格，默认 pentagram。
+当环境没有 huashu-design skill 时使用。
+根据游戏类型匹配内置风格子集，生成结构化卡片式 HTML。
 """
 
 from __future__ import annotations
@@ -835,7 +835,7 @@ def main() -> None:
     parser.add_argument("output")
     parser.add_argument("--style", default="auto",
                         choices=["auto", *STYLE_ROOTS.keys()],
-                        help="设计风格名称；auto 会根据 project_state 匹配 huashu 子风格")
+                        help="兜底设计风格名称；auto 会根据 project_state 匹配内置风格")
     parser.add_argument("--state", default=None,
                         help="project_state.json 路径；--style auto 时用于匹配设计风格")
     parser.add_argument("--prompts", default=None,

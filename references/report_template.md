@@ -84,14 +84,17 @@ M7 固定输出一份报告：
 
 ## HTML 输出
 
-HTML 报告必须由 huashu-design 执行设计，不使用固定版式模板。
+HTML 报告采用两级输出逻辑：
+
+1. 如果使用者环境存在 huashu-design：调用 huashu-design 执行定制排版。
+2. 如果使用者环境没有 huashu-design：使用内置结构化 HTML 兜底，尽量用卡片式布局、表格、重点摘要和关键画面卡片提高可读性。
 
 推荐流程：
 
 1. 先生成 `report/report.md`。
-2. 运行 `scripts/build_huashu_brief.py {project_dir}`，生成 `report/huashu_design_brief.md`。
-3. 调用 huashu-design skill，读取该 brief、`report/report.md`、`images/prompts.jsonl` 和已生成图片，产出最终 `report/report.html`。
-4. 只有无法调用 huashu-design 时，才用 `scripts/md_to_html.py` 作为兜底转换器。
+2. 运行 `scripts/check_design_backend.py --json`。
+3. 若返回 `backend = huashu-design`：运行 `scripts/build_huashu_brief.py {project_dir}`，再调用 huashu-design skill 产出最终 `report/report.html`。
+4. 若返回 `backend = structured-html`：运行 `scripts/md_to_html.py` 产出结构化卡片式兜底 HTML。
 
 报告内容组织规则：
 
@@ -99,3 +102,4 @@ HTML 报告必须由 huashu-design 执行设计，不使用固定版式模板。
 - 只要能用表格清晰表达，不要写成长段落。
 - 不要默认把所有数值表格做成图表；只有当图表能显著减少理解成本时，才设计专门的图表模块。
 - HTML 设计可以重排内容、做卡片、做导航、做重点摘要，但不能丢失核心结论。
+- 兜底 HTML 不是普通 Markdown 直出，必须保留顶部摘要、目录、章节卡片、表格卡片、关键画面提示词卡片。

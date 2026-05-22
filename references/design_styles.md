@@ -1,7 +1,10 @@
-# 报告设计风格库
+# 兜底 HTML 报告设计风格库
 
-从 huashu-design 的 20 种设计哲学中精选 8 种，按游戏类型自动匹配报告视觉风格。
-每种风格提供完整的 CSS 变量定义，由 `scripts/md_to_html.py --style <name>` 动态生成。默认使用 `--style auto --state project_state.json` 自动匹配。
+本文件只用于当前环境没有 `huashu-design` skill 时的结构化 HTML 兜底输出。
+
+M7 HTML 的主路径是：检测到 `huashu-design` 时，直接调用该 skill 读取 `report/huashu_design_brief.md`、`report/report.md`、`images/prompts.jsonl` 和已生成图片，完成定制排版并产出 `report/report.html`。
+
+若当前环境没有 `huashu-design`，才使用 `scripts/md_to_html.py` 的内置卡片式布局。本文件从 huashu-design 的 20 种设计哲学中精选 8 种，作为兜底 HTML 的 CSS 变量库，按游戏类型自动匹配报告视觉风格。
 
 ## 游戏类型 → 设计风格映射
 
@@ -217,7 +220,7 @@
 }
 ```
 
-## 选择逻辑
+## 兜底选择逻辑
 
 1. 从 `project_state.inputs.art_style` 或 `project_state.inputs.theme` 提取游戏题材关键词
 2. 按「游戏类型 → 设计风格映射」表匹配
@@ -225,6 +228,7 @@
 4. 无匹配时回退为 `pentagram`
 5. 调用 `scripts/md_to_html.py --style auto --state project_state.json ...`
 6. 将脚本输出的风格名写入 `project_state.report.design_style`
+7. 在对话中说明“HTML 为结构化兜底版，非 huashu-design 定制版”
 
 ## 图表策略
 
@@ -232,4 +236,6 @@
 
 ## 与 huashu-design 的关系
 
-本文件是从 huashu-design skill (`references/design-styles.md`) 的 20 种设计哲学中精选的游戏立项报告适配子集。完整设计方向顾问流程（20 种 × 5 流派 × 24 个 showcase）仍通过 huashu-design skill 调用。
+本文件不是 huashu-design 的替代实现，也不用于限制 huashu-design 的排版。它只保证没有 huashu-design 的环境仍能生成可读、结构化、卡片式的 HTML 报告。
+
+完整设计方向顾问流程、版式选择、视觉语言和高保真 HTML 生成，仍通过 huashu-design skill 调用。

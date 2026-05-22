@@ -40,7 +40,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 4. M4 立项初案：生成 `concept.md`、`shotlist.md`，填写四条 `direction_hypotheses`。
 5. M5 关键画面提示词：默认只生成 `images/prompts.jsonl`。配置 `BANANA_API_KEY` + `BANANA_MODEL_KEY` 后调用 `scripts/gen_image.py --provider banana` 可实际出图，图片写入 `generated_image` 字段。除主视觉、宣传图、纯氛围场景外，提示词必须以”手游实际画面截图”为目标，包含 UI、镜头、布局和可读玩法信息，用来判断项目是否可行。
 6. M6 演示视频分镜：默认只生成 `video/storyboard.md`。
-7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 设计必须调用 `huashu-design` 执行，不使用固定版式模板。
+7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 输出先检测设计后端，有 `huashu-design` 时调用它定制排版，没有时使用内置结构化卡片式 HTML 兜底。
 8. M8 风格迭代：只在用户对 M5 不满意时进入。
 
 # 判断标签
@@ -58,8 +58,9 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 - 状态：`scripts/state.py`
 - 搜索：`scripts/search_web.py`
 - 抓取：`scripts/fetch_url.py`
+- HTML 后端检测：`scripts/check_design_backend.py`
 - HTML 设计 brief：`scripts/build_huashu_brief.py`
-- HTML 兜底转换：`scripts/md_to_html.py`（仅在无法调用 huashu-design 时使用）
+- HTML 兜底转换：`scripts/md_to_html.py`（无 huashu-design 时使用，输出结构化卡片布局）
 - 产物路径：`scripts/list_outputs.py`
 - 资产索引：`scripts/asset_index.py`
 - 可选出图：`scripts/gen_image.py`

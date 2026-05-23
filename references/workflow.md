@@ -74,21 +74,19 @@
    ```bash
    python scripts/check_design_backend.py --json
    ```
-3. 如果检测到 huashu-design，运行 `scripts/build_huashu_brief.py` 生成 HTML 设计 brief：
+3. 如果检测到 modern-minimal-html，运行 `scripts/build_html_brief.py` 生成 HTML 设计 brief：
    ```bash
-   python scripts/build_huashu_brief.py <project_dir>
+   python scripts/build_html_brief.py <project_dir>
    ```
-4. 调用 huashu-design skill 读取 `report/huashu_design_brief.md`、`report/report.md`、`images/prompts.jsonl` 和已生成图片，设计并产出 `report/report.html`。
-5. 如果当前环境没有 huashu-design，使用内置兜底转换：
+4. 调用 modern-minimal-html skill 读取 `report/html_design_brief.md`、`report/report.md`、`images/prompts.jsonl` 和已生成图片，设计并产出 `report/report.html`。
+5. 如果当前环境没有 modern-minimal-html，使用内置兜底转换：
    ```bash
    python scripts/md_to_html.py report/report.md report/report.html \
-     --style auto \
-     --state project_state.json \
      --prompts images/prompts.jsonl
    ```
-   兜底 HTML 必须使用结构化卡片式布局，尽量把长文本拆成可读模块，并在对话中说明“HTML 为结构化兜底版，非 huashu-design 定制版”。
+   兜底 HTML 使用 modern-minimal-html 的 CSS 变量体系 + 组件模块（白底细框高密度），并在对话中说明"HTML 为兜底版，非 modern-minimal-html 定制版"。
 6. 若联网失败降级，报告封面必须提示证据不足。
-7. 对话中返回 `report/report.md`、`report/report.html`、可选 `report/huashu_design_brief.md` 与 `project_state.json` 的路径。
+7. 对话中返回 `report/report.md`、`report/report.html`、可选 `report/html_design_brief.md` 与 `project_state.json` 的路径。
 
 ## M8 风格迭代
 

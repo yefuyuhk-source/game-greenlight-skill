@@ -37,7 +37,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 1. M1 需求采集与关键词生成：见 `references/workflow.md`。
 2. M2 证据驱动调研：必须遵守 `references/research_protocol.md`。
 3. M3 选题推荐：必须遵守 `references/scoring_rubric.md`。
-4. M4 立项初案：生成 `concept.md`、`shotlist.md`，填写四条 `direction_hypotheses`。
+4. M4 立项初案：生成 `concept.md`，按 `references/shot_taxonomy.md` 槽位规则生成 `shotlist.md`（6 固定核心 + 2~3 品类替换 + 1 可选社交），填写四条 `direction_hypotheses`。
 5. M5 关键画面提示词：默认只生成 `images/prompts.jsonl`。配置 `BANANA_API_KEY` + `BANANA_MODEL_KEY` 后调用 `scripts/gen_image.py --provider banana` 可实际出图，图片写入 `generated_image` 字段。除主视觉、宣传图、纯氛围场景外，提示词必须以”手游实际画面截图”为目标，包含 UI、镜头、布局和可读玩法信息，用来判断项目是否可行。
 6. M6 演示视频分镜：默认只生成 `video/storyboard.md`。
 7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 输出先检测设计后端，有 `huashu-design` 时调用它定制排版，没有时使用内置结构化卡片式 HTML 兜底。

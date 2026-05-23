@@ -13,6 +13,7 @@ import argparse
 import base64
 import json
 import os
+import re
 import sys
 import time
 import urllib.request
@@ -129,6 +130,8 @@ def run_toapis(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
 
     for index, item in enumerate(prompts):
         shot_id = item.get("shot_id", f"shot-{index}")
+        # 消毒：防止路径穿越
+        safe_id = re.sub(r"[/\\]+", "_", str(shot_id)).strip(".")
         name = item.get("name", shot_id)
         prompt = item.get("prompt_v1") or item.get("prompt") or ""
         render_mode = item.get("render_mode", "mobile_screenshot")
@@ -207,7 +210,7 @@ def run_toapis(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
         elif image_url.endswith(".webp"):
             ext = ".webp"
 
-        filename = f"{shot_id}{ext}"
+        filename = f"{safe_id}{ext}"
         filepath = output_dir / filename
         filepath.write_bytes(image_bytes)
         item["generated_image"] = str(filepath.relative_to(output_dir.parent))
@@ -250,11 +253,16 @@ def banana_generate(api_key: str, model_key: str, prompt: str,
         return None
 
     outputs = data.get("modelOutputs")
-    if not outputs:
+    if not outputs or not isinstance(outputs, list) or not outputs:
         print(f"[banana] 响应无 modelOutputs: {json.dumps(data, ensure_ascii=False)[:200]}", file=sys.stderr)
         return None
 
-    image_b64 = outputs[0].get("image_base64")
+    first_output = outputs[0]
+    if not isinstance(first_output, dict):
+        print(f"[banana] modelOutputs[0] 不是 dict: {type(first_output)}", file=sys.stderr)
+        return None
+
+    image_b64 = first_output.get("image_base64")
     if not image_b64:
         print(f"[banana] modelOutputs 无 image_base64", file=sys.stderr)
         return None
@@ -279,6 +287,8 @@ def run_banana(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
 
     for index, item in enumerate(prompts):
         shot_id = item.get("shot_id", f"shot-{index}")
+        # 消毒：防止路径穿越
+        safe_id = re.sub(r"[/\\]+", "_", str(shot_id)).strip(".")
         name = item.get("name", shot_id)
         prompt = item.get("prompt_v1") or item.get("prompt") or ""
         negative = item.get("negative") or ""
@@ -300,7 +310,7 @@ def run_banana(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
             print(f"[banana] {shot_id} 生成失败，跳过", file=sys.stderr)
             continue
 
-        filename = f"{shot_id}.png"
+        filename = f"{safe_id}.png"
         filepath = output_dir / filename
         filepath.write_bytes(image_bytes)
         item["generated_image"] = str(filepath.relative_to(output_dir.parent))

@@ -319,10 +319,11 @@ def main() -> None:
     target = Path(args.output)
     prompts = load_prompts(Path(args.prompts) if args.prompts else None)
 
-    # 计算图片路径前缀：从 HTML 所在目录回到项目根目录
-    cwd = Path.cwd()
+    # 计算图片路径前缀：从 HTML 所在目录回到 source 所在的项目根目录
+    # source 是 report/report.md，其 parent 是 report/，其 parent 是项目根
+    project_root = source.resolve().parent.parent
     try:
-        image_prefix = Path(os.path.relpath(cwd, target.parent.resolve()))
+        image_prefix = Path(os.path.relpath(project_root, target.parent.resolve()))
     except ValueError:
         image_prefix = Path("..")
 

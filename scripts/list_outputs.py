@@ -8,29 +8,63 @@ from pathlib import Path
 
 
 STEP_FILES = {
-    "M1": ["inputs.md", "project_state.json"],
-    "M2": ["research/sources.jsonl", "research/findings.md", "research/direction.md", "project_state.json"],
-    "M3": ["candidates.md", "project_state.json"],
-    "M4": ["concept.md", "shotlist.md", "project_state.json"],
-    "M5": ["images/prompts.jsonl", "project_state.json"],
-    "M6": ["video/storyboard.md", "video/final.mp4", "project_state.json"],
-    "M7": ["report/report.md", "report/report.html", "report/html_design_brief.md", "project_state.json"],
-    "M8": ["images/prompts.jsonl", "project_state.json"],
+    "M1": [
+        ("inputs.md", "需求采集文档"),
+        ("project_state.json", "项目状态文件"),
+    ],
+    "M2": [
+        ("research/sources.jsonl", "调研数据源"),
+        ("research/findings.md", "调研发现报告"),
+        ("research/direction.md", "方向判断"),
+        ("project_state.json", "项目状态文件"),
+    ],
+    "M3": [
+        ("candidates.md", "选题候选清单"),
+        ("project_state.json", "项目状态文件"),
+    ],
+    "M4": [
+        ("concept.md", "立项概念文档"),
+        ("shotlist.md", "画面槽位列表"),
+        ("project_state.json", "项目状态文件"),
+    ],
+    "M5": [
+        ("images/prompts.jsonl", "关键画面提示词"),
+        ("project_state.json", "项目状态文件"),
+    ],
+    "M6": [
+        ("video/storyboard.md", "演示视频分镜"),
+        ("video/final.mp4", "演示视频成品"),
+        ("project_state.json", "项目状态文件"),
+    ],
+    "M7": [
+        ("report/report.md", "立项报告（Markdown）"),
+        ("report/report.html", "立项报告（HTML）"),
+        ("report/html_design_brief.md", "HTML 设计 Brief"),
+        ("project_state.json", "项目状态文件"),
+    ],
+    "M8": [
+        ("images/prompts.jsonl", "关键画面提示词（迭代版）"),
+        ("project_state.json", "项目状态文件"),
+    ],
 }
 
 
-def existing_outputs(project_dir: Path, step: str | None) -> list[Path]:
-    candidates: list[str]
+def existing_outputs(project_dir: Path, step: str | None) -> list[tuple[str, str]]:
+    """返回 (文件名, 中文描述) 列表。"""
+    candidates: list[tuple[str, str]]
     if step:
         candidates = STEP_FILES.get(step, [])
     else:
-        candidates = sorted({item for items in STEP_FILES.values() for item in items})
-    paths = []
-    for item in candidates:
-        path = project_dir / item
-        if path.exists():
-            paths.append(path)
-    return paths
+        candidates = sorted(
+            {item for items in STEP_FILES.values() for item in items},
+            key=lambda x: x[0],
+        )
+    results = []
+    for rel_path, desc in candidates:
+        full_path = project_dir / rel_path
+        if full_path.exists():
+            results.append((str(full_path), desc))
+    return results
 
 
 def main() -> None:
@@ -47,11 +81,11 @@ def main() -> None:
     if args.markdown:
         if not paths:
             print("- 暂无已生成产物")
-        for path in paths:
-            print(f"- `{path}`")
+        for full_path, desc in paths:
+            print(f"- **{desc}**：`{full_path}`")
     else:
-        for path in paths:
-            print(path)
+        for full_path, desc in paths:
+            print(f"{desc}: {full_path}")
 
 
 if __name__ == "__main__":

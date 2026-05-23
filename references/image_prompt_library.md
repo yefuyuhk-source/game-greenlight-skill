@@ -1,5 +1,16 @@
 # M5 关键画面提示词模板
 
+> ⚠️ **归档参考（2026-05）**
+> M5 提示词生成已迁移至 `scripts/build_prompts.py` + 三层 YAML 配置。
+> 本文件保留为模板内容说明，实际执行来源为：
+> - `references/prompt_base.yaml` — 全局基础层
+> - `references/category_prompts.yaml` — 13 品类专属配置
+> - `references/slot_prompts.yaml` — 槽位定义
+>
+> 编辑新品类或新槽位时，请修改以上 YAML 文件，而非本 markdown。
+>
+> ---
+
 默认只生成提示词，不调用图像 API。每条提示词写入 `images/prompts.jsonl`。
 
 画面槽位由 M4 根据 `references/shot_taxonomy.md` 的槽位规则生成，M5 不自行决定画面数量和类型。

@@ -135,6 +135,18 @@ M1 至少要获得 `theme`、`gameplay`、`art_style`、`platforms`、`audience`
 {
   "concept_path": "concept.md",
   "shotlist_path": "shotlist.md",
+  "fields": {
+    "name": "",
+    "main_character": "",
+    "characters": [],
+    "key_scene": "",
+    "theme_keywords": [],
+    "enemies": [],
+    "boss_description": "",
+    "landmark_scene": "",
+    "featured_character": "",
+    "color_preference": ""
+  },
   "direction_hypotheses": {
     "target_players": "具体玩家画像",
     "pain_or_thrill": "痛点或爽点",

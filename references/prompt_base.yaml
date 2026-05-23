@@ -1,0 +1,78 @@
+# ========================================
+# Prompt Base Layer - 全局通用配置
+# 版本: v1.0
+# 用途: M5 提示词组装时作为最底层锚点
+# ========================================
+
+version: "1.0"
+last_updated: "2026-05-23"
+
+# ------- 世界观锚点（强制注入每条提示词，保证主题一致） -------
+world_context:
+  template: "{game_name} is a {atmosphere_keyword} mobile game set in {key_scene}, featuring {main_character}"
+  style: "game screenshot, consistent art style, unified world identity"
+  note: "每条提示词都以世界锚点开头，确保跨槽位主题一致性"
+
+# ------- 锚点词（按 with_ui 二选一，最高权重前置） -------
+anchors:
+  with_ui_true: "in-game screenshot, gameplay UI, HUD interface, mobile game capture, real game footage style"
+  with_ui_false: "key visual, official promotional artwork, game cover art, marketing illustration"
+
+# ------- 全局负面词（强制注入所有图，防止跑偏） -------
+negative_global: |
+  concept art sketch, unfinished work, rough draft,
+  oil painting, traditional media, watercolor, ink wash,
+  cinematic film still, movie poster, hollywood film,
+  excessive depth of field blur, bokeh background,
+  blurry text, garbled letters, illegible UI text, deformed UI elements,
+  watermark, signature, artist name, copyright text,
+  low quality, jpeg artifacts, pixelated, lowres,
+  deformed hands, extra fingers, malformed limbs, bad anatomy,
+  duplicate, cropped, out of frame
+
+# ------- UI 类画面额外负面词（with_ui=true 时追加） -------
+negative_ui_extra: |
+  poster, cinematic key visual, pure illustration, no UI,
+  mockup-only, unreadable tiny text, cluttered interface,
+  inconsistent icon style
+
+# ------- 技术参数默认值 -------
+tech_default:
+  resolution: "1920x1080"
+  aspect_ratio: "16:9"
+  steps: 25
+  sampler: "DPM++ 2M Karras"
+
+# ------- LLM 润色配置 -------
+llm_polish:
+  enabled_slots: ["S1", "S2", "S5"]
+  instruction: |
+    Refine the following structured prompt fragments into a single cohesive,
+    fluent English image generation prompt. Preserve all key visual elements,
+    UI details, and gameplay information. Make the language smooth and
+    evocative. Output only the final prompt text, no commentary.
+
+# ------- 变量占位符规范 -------
+variable_schema:
+  game_name: "从 project_state.concept.fields.name 读取"
+  main_character: "从 project_state.concept.fields.main_character 读取"
+  characters: "从 project_state.concept.fields.characters[] 拼接，最多 3 个"
+  key_scene: "从 project_state.concept.fields.key_scene 读取"
+  atmosphere_keyword: "从 project_state.concept.fields.theme_keywords[] 取首项"
+  enemy_type: "从 project_state.concept.fields.enemies[] 取首项，缺省时用 generic enemy"
+  boss_description: "从 project_state.concept.fields.boss_description 读取"
+  landmark_scene: "从 project_state.concept.fields.landmark_scene 读取"
+  featured_character: "从 project_state.concept.fields.featured_character 读取，缺省时取 main_character"
+  color_preference: "从 project_state.concept.fields.color_preference 读取，作为色调强化"
+
+# ------- 世界观锚点注入说明 -------
+world_anchor_note: |
+  所有提示词以 world_context.template 作为第一条碎片注入，
+  保证 S1-S10 每条提示词都从同一个世界观描述开始，
+  即使槽位不同，整体主题、美术风格、角色身份保持一致。
+
+# ------- 兜底策略 -------
+fallback:
+  missing_variable: "用品类层 default_subject 替换"
+  missing_category: "走通用 fallback_prompt（场景+角色+玩法各一）"
+  missing_reference: "降级为纯文生图（不使用 image-to-image）"

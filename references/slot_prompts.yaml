@@ -1,0 +1,184 @@
+# ========================================
+# Slot Prompt Layer - 槽位专属配置
+# 版本: v1.0
+# 覆盖: 6 固定核心 + 1 可选社交
+# 品类替换槽位（S7-S9）定义在 category_prompts.yaml 的 replacement_shots
+# ========================================
+
+version: "1.0"
+last_updated: "2026-05-23"
+
+# ============== S1 主视觉 KV ==============
+S1:
+  name: "主视觉 KV"
+  slot_type: fixed
+  with_ui: false
+  llm_polish: true
+  composition: "hero composition with dynamic pose, eye-catching focal point, balanced negative space for title placement"
+  subject_template: "{main_character} alongside {characters} in {key_scene}, {atmosphere_keyword} atmosphere, dramatic heroic lighting"
+  camera_override: "promotional KV angle, slightly cinematic but maintaining game-stylized aesthetic"
+  must_include:
+    - "title space at top or bottom"
+    - "focal character clearly emphasized"
+    - "world-building elements visible"
+    - "high visual impact for store page use"
+  must_exclude:
+    - "in-game UI elements, HUD, minimap"
+    - "dialogue box, gameplay buttons"
+  detail_checklist:
+    - "视角与构图"
+    - "关键角色"
+    - "环境细节"
+    - "世界观传达"
+  reference_match: ["kv_main_*"]
+
+# ============== S2 标志性场景图 ==============
+S2:
+  name: "标志性场景图"
+  slot_type: fixed
+  with_ui: false
+  llm_polish: true
+  composition: "wide establishing shot, atmospheric environmental storytelling, props and architecture that reveal the world"
+  subject_template: "{landmark_scene} in {game_name}, {atmosphere_keyword} atmosphere, {color_preference} color palette, environmental storytelling"
+  camera_override: "wide angle, environmental focus, no character closeup"
+  must_include:
+    - "recognizable landmark or signature location"
+    - "environmental details that tell a story"
+    - "lighting that sets the mood and time of day"
+  must_exclude:
+    - "characters as primary focus"
+    - "UI elements, gameplay actions"
+  detail_checklist:
+    - "视角与构图"
+    - "环境细节"
+    - "光影与色调"
+  reference_match: ["scene_establishing_*"]
+
+# ============== S3 主界面 ==============
+S3:
+  name: "主界面"
+  slot_type: fixed
+  with_ui: true
+  llm_polish: false
+  composition: "central hub background with mode entrance buttons, resource bar at top, event banner"
+  subject_template: "{game_name} main menu, {key_scene} visible in background, player avatar and resources displayed, mode selection buttons"
+  camera_override: "frontal UI view, no 3D camera angle"
+  ui_layout: |
+    top: resource bar (currency/level/energy), player avatar, settings gear icon;
+    center: background scene with parallax depth, showing a glimpse of the game world;
+    bottom: main mode entrance buttons (start/battle/shop/gacha);
+    right side: event banners with illustrated thumbnails and countdown badges;
+    left side: notification badge, mail icon, friend invite
+  must_include:
+    - "game title or logo representation"
+    - "main mode entrance buttons"
+    - "resource display (currency/level)"
+    - "background scene from the game world"
+  must_exclude:
+    - "popup ads or interstitial offers"
+    - "third-party branding"
+    - "real-money purchase prompts"
+  reference_match: ["ui_main_menu_*"]
+
+# ============== S4 战斗 / 核心玩法画面 ==============
+S4:
+  name: "战斗 / 核心玩法画面"
+  slot_type: fixed
+  with_ui: true
+  llm_polish: false
+  composition: "gameplay view with player units and enemies, action in progress, clear battle UI layout"
+  subject_template: "{game_name} core gameplay, {enemy_type} encounter in {key_scene}, player units deployed at strategic positions"
+  camera_override: "standard gameplay perspective (top-down / isometric / side-view as appropriate for genre)"
+  ui_layout: |
+    top area: wave progress indicator, timer or turn counter, score/combo display;
+    bottom-right: skill buttons with cooldown rings, ultimate gauge, swap character button;
+    bottom-left: movement control or unit selection (d-pad or click-to-select);
+    center: action area with player units, enemies, interactive elements;
+    units: health bars above each unit, level indicators, debuff/buff icons;
+    feedback: damage numbers, critical hit effects, range indicators, targeting reticle
+  must_include:
+    - "action in progress with visible gameplay state"
+    - "player units and enemies clearly differentiated"
+    - "skill buttons with cooldown or cost indicators"
+    - "health bars or status indicators on key units"
+    - "visual feedback (damage numbers, effects)"
+  must_exclude:
+    - "cinematic camera angles that obscure gameplay"
+    - "extreme closeups of single character"
+    - "empty scene with no gameplay elements"
+  reference_match: ["ui_gameplay_*"]
+
+# ============== S5 Boss战 / 高潮场景 ==============
+S5:
+  name: "Boss战 / 高潮场景"
+  slot_type: fixed
+  with_ui: true
+  llm_polish: true
+  composition: "oversized boss encounter, dramatic moment, high tension but gameplay still readable"
+  subject_template: "{boss_description} boss fight in {key_scene}, {main_character} leading the assault, {atmosphere_keyword} climax moment, high stakes"
+  camera_override: "slightly dramatic angle but maintaining gameplay readability and UI visibility"
+  must_include:
+    - "oversized boss or high-stakes encounter with segmented health bar"
+    - "player units in formation around key positions"
+    - "danger warning banner or phase indicator"
+    - "skill effects and defensive abilities visible"
+    - "high tension moment that conveys excitement"
+  must_exclude:
+    - "fully cinematic shot that hides gameplay mechanics"
+    - "excessive motion blur that obscures readability"
+    - "empty battlefield"
+  reference_match: ["ui_boss_*"]
+
+# ============== S6 角色养成 / 成长系统 ==============
+S6:
+  name: "角色养成 / 成长系统"
+  slot_type: fixed
+  with_ui: true
+  llm_polish: false
+  composition: "character roster or upgrade tree with stats, levels and progression milestones"
+  subject_template: "{game_name} character progression, {main_character} upgrade screen with skill tree and equipment slots, resource costs displayed"
+  camera_override: "frontal UI view, interface screenshot style"
+  ui_layout: |
+    main area: character or unit roster with portrait, name, level, stars/rarity;
+    right panel: selected character detail - stats, skills, equipped items;
+    bottom: upgrade tree or skill paths with visible nodes, lock/unlock states;
+    upgrade button with resource cost preview (currency, materials);
+    progression bar showing next milestone and rewards;
+    left sidebar: filter tabs (all/attack/defense/support)
+  must_include:
+    - "character/unit roster with visual differentiation"
+    - "upgrade paths or skill tree with visible nodes"
+    - "resource costs near upgrade buttons"
+    - "progression bar or milestone indicator"
+    - "selection highlight on active character"
+  must_exclude:
+    - "combat scene or real-time action"
+    - "empty UI mockup with no character data"
+  reference_match: ["ui_progression_*"]
+
+# ============== S10 系统与社交界面（可选） ==============
+S10:
+  name: "系统与社交界面"
+  slot_type: optional
+  with_ui: true
+  llm_polish: false
+  enabled_when: "category.social_slot_enabled == true"
+  composition: "social interaction interface with list panel and detail panel layout"
+  subject_template: "{game_name} social hub, guild or friend system with member roster, chat panel and interaction options"
+  camera_override: "frontal UI screenshot, no 3D scene"
+  ui_layout: |
+    left panel: list view (guild members / friends / chat channels) with avatars, online status, level;
+    right panel: detail view - selected member info card, chat message window, guild perks or contribution;
+    top: navigation tabs for switching between chat / friends / guild / mail;
+    bottom: input box for chat, action buttons (invite / message / gift / team-up);
+    notification badges for pending requests and events
+  must_include:
+    - "avatar grid with online/offline indicators"
+    - "chat bubbles or message list"
+    - "social action buttons (add friend / send gift / invite / team-up)"
+  must_exclude:
+    - "combat scene or battle elements"
+    - "character growth panel or equipment screen"
+    - "single-player gameplay elements"
+  weight_priority: 6
+  reference_match: ["ui_social_*", "ui_guild_*", "ui_chat_*"]

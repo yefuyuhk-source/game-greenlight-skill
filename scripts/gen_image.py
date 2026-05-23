@@ -2,6 +2,7 @@
 """图像 provider 统一入口。
 
 支持的 provider:
+- toapis: 调用 ToAPIs Gemini 2.5 Flash Image API（异步任务，自动轮询）
 - banana: 调用 Banana.dev serverless GPU API（Stable Diffusion）
 - 未配置时降级为仅生成提示词
 """
@@ -13,12 +14,23 @@ import base64
 import json
 import os
 import sys
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
 
+TOAPIS_API_URL = "https://toapis.com/v1/images/generations"
 BANANA_API_URL = "https://api.banana.dev/score/v4/"
+
+# 尺寸比例 → ToAPIs size 参数映射
+ASPECT_MAP = {
+    "1:1": "1:1",
+    "16:9": "16:9",
+    "9:16": "9:16",
+    "4:3": "4:3",
+    "3:4": "3:4",
+}
 
 
 def now_iso() -> str:
@@ -38,6 +50,173 @@ def load_prompts(path: Path) -> list[dict]:
 def save_prompts(path: Path, prompts: list[dict]) -> None:
     lines = [json.dumps(p, ensure_ascii=False) for p in prompts]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+# ── ToAPIs provider ──────────────────────────────────────────────────
+
+
+def toapis_submit(api_key: str, prompt: str, size: str = "1:1",
+                  model: str = "gemini-2.5-flash-image-preview") -> dict | None:
+    """提交图像生成任务，返回任务响应 JSON。"""
+    payload = {
+        "model": model,
+        "prompt": prompt[:1000],  # API 限制 1000 字符
+        "size": size,
+        "n": 1,
+    }
+    req = urllib.request.Request(
+        TOAPIS_API_URL,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:
+        print(f"[toapis] 提交失败: {exc}", file=sys.stderr)
+        return None
+
+
+def toapis_poll(api_key: str, task_id: str) -> dict | None:
+    """轮询任务状态，返回最新响应 JSON。"""
+    url = f"{TOAPIS_API_URL}/{task_id}"
+    req = urllib.request.Request(
+        url,
+        headers={"Authorization": f"Bearer {api_key}"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:
+        print(f"[toapis] 轮询失败: {exc}", file=sys.stderr)
+        return None
+
+
+def toapis_download(url: str) -> bytes | None:
+    """下载生成的图片。"""
+    try:
+        req = urllib.request.Request(url)
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            return resp.read()
+    except Exception as exc:
+        print(f"[toapis] 下载失败: {exc}", file=sys.stderr)
+        return None
+
+
+def resolve_size(render_mode: str) -> str:
+    """根据 render_mode 返回 ToAPIs size 参数。"""
+    if render_mode == "concept_allowed":
+        return "16:9"
+    elif render_mode == "production_sheet":
+        return "1:1"
+    else:  # mobile_screenshot
+        return "9:16"
+
+
+def run_toapis(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
+    """运行 ToAPIs provider，返回 (更新后的 prompts, 成功张数)。"""
+    api_key = os.environ.get("TOAPIS_API_KEY")
+    if not api_key:
+        raise SystemExit("缺少 TOAPIS_API_KEY 环境变量")
+
+    prompts = load_prompts(prompts_path)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    success = 0
+
+    for index, item in enumerate(prompts):
+        shot_id = item.get("shot_id", f"shot-{index}")
+        name = item.get("name", shot_id)
+        prompt = item.get("prompt_v1") or item.get("prompt") or ""
+        render_mode = item.get("render_mode", "mobile_screenshot")
+        size = resolve_size(render_mode)
+
+        if not prompt.strip():
+            print(f"[toapis] {shot_id} «{name}» 提示词为空，跳过", file=sys.stderr)
+            continue
+
+        print(f"[toapis] 提交 {shot_id} «{name}» (size={size}) ...")
+        task = toapis_submit(api_key, prompt, size=size)
+        if task is None:
+            print(f"[toapis] {shot_id} 提交失败，跳过", file=sys.stderr)
+            continue
+
+        task_id = task.get("id")
+        if not task_id:
+            print(f"[toapis] 响应无 task id: {json.dumps(task, ensure_ascii=False)[:200]}", file=sys.stderr)
+            continue
+
+        # 轮询直到完成
+        max_wait = 300  # 最多等 5 分钟
+        poll_interval = 5
+        elapsed = 0
+        image_url = None
+
+        status_data = None
+        while elapsed < max_wait:
+            time.sleep(poll_interval)
+            elapsed += poll_interval
+
+            status_data = toapis_poll(api_key, task_id)
+            if status_data is None:
+                continue
+
+            status = status_data.get("status", "")
+            progress = status_data.get("progress", 0)
+            print(f"[toapis] {shot_id} 状态: {status} ({progress}%)")
+
+            if status == "completed":
+                # 从响应中提取图片 URL
+                images = status_data.get("images") or status_data.get("data") or []
+                if isinstance(images, list) and images:
+                    first = images[0]
+                    if isinstance(first, dict):
+                        image_url = first.get("url") or first.get("image_url")
+                    elif isinstance(first, str):
+                        image_url = first
+                break
+            elif status == "failed":
+                error = status_data.get("error", status_data.get("message", "unknown"))
+                print(f"[toapis] {shot_id} 任务失败: {error}", file=sys.stderr)
+                break
+
+        if not image_url:
+            # 兜底：检查响应的其它常见字段
+            image_url = (
+                status_data.get("image_url")
+                or status_data.get("url")
+            ) if status_data else None
+
+        if not image_url:
+            print(f"[toapis] {shot_id} 未获取到图片 URL", file=sys.stderr)
+            continue
+
+        print(f"[toapis] {shot_id} 下载图片 ...")
+        image_bytes = toapis_download(image_url)
+        if image_bytes is None:
+            continue
+
+        # 保存
+        ext = ".png"
+        if image_url.endswith(".jpg") or image_url.endswith(".jpeg"):
+            ext = ".jpg"
+        elif image_url.endswith(".webp"):
+            ext = ".webp"
+
+        filename = f"{shot_id}{ext}"
+        filepath = output_dir / filename
+        filepath.write_bytes(image_bytes)
+        item["generated_image"] = str(filepath.relative_to(output_dir.parent))
+        success += 1
+        print(f"[toapis] {shot_id} 完成 -> {filepath}")
+
+    save_prompts(prompts_path, prompts)
+    return prompts, success
+
+
+# ── Banana provider ──────────────────────────────────────────────────
 
 
 def banana_generate(api_key: str, model_key: str, prompt: str,
@@ -103,13 +282,12 @@ def run_banana(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
         negative = item.get("negative") or ""
         render_mode = item.get("render_mode", "mobile_screenshot")
 
-        # 根据 render_mode 调整尺寸
         if render_mode == "production_sheet":
             width, height = 1024, 1024
         elif render_mode == "concept_allowed":
             width, height = 1216, 832
         else:
-            width, height = 768, 1344  # 9:16 mobile
+            width, height = 768, 1344
 
         print(f"[banana] 生成 {shot_id} «{name}» ({width}x{height}) ...")
         image_bytes = banana_generate(
@@ -129,6 +307,9 @@ def run_banana(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
 
     save_prompts(prompts_path, prompts)
     return prompts, success
+
+
+# ── 主入口 ───────────────────────────────────────────────────────────
 
 
 def main() -> None:
@@ -179,6 +360,24 @@ def main() -> None:
         )
         return
 
+    if args.provider == "toapis":
+        updated, success = run_toapis(prompts_path, output_dir)
+        print(
+            json.dumps(
+                {
+                    "ok": True,
+                    "provider": "toapis",
+                    "total": len(updated),
+                    "success": success,
+                    "output_dir": str(output_dir),
+                    "time": now_iso(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return
+
     if args.provider == "banana":
         updated, success = run_banana(prompts_path, output_dir)
         print(
@@ -199,7 +398,7 @@ def main() -> None:
 
     raise SystemExit(
         f"provider '{args.provider}' 尚未安装 adapter。"
-        f"支持的 provider: banana"
+        f"支持的 provider: toapis, banana"
     )
 
 

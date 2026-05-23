@@ -38,7 +38,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 2. M2 证据驱动调研：必须遵守 `references/research_protocol.md`。
 3. M3 选题推荐：必须遵守 `references/scoring_rubric.md`。
 4. M4 立项初案：生成 `concept.md`，按 `references/shot_taxonomy.md` 槽位规则生成 `shotlist.md`（6 固定核心 + 2~3 品类替换 + 1 可选社交），填写四条 `direction_hypotheses`。
-5. M5 关键画面提示词：默认只生成 `images/prompts.jsonl`。配置 `BANANA_API_KEY` + `BANANA_MODEL_KEY` 后调用 `scripts/gen_image.py --provider banana` 可实际出图，图片写入 `generated_image` 字段。除主视觉、宣传图、纯氛围场景外，提示词必须以”手游实际画面截图”为目标，包含 UI、镜头、布局和可读玩法信息，用来判断项目是否可行。
+5. M5 关键画面提示词：默认只生成 `images/prompts.jsonl`。配置 `TOAPIS_API_KEY` 后调用 `scripts/gen_image.py --provider toapis` 可实际出图（Gemini 2.5 Flash Image），图片写入 `generated_image` 字段。除主视觉、宣传图、纯氛围场景外，提示词必须以"手游实际画面截图"为目标，包含 UI、镜头、布局和可读玩法信息，用来判断项目是否可行。
 6. M6 演示视频分镜：默认只生成 `video/storyboard.md`。
 7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 输出先检测设计后端（`modern-minimal-html`），有则调用它定制排版，没有时使用内置结构化卡片式 HTML 兜底（`scripts/md_to_html.py`）。
 8. M8 风格迭代：只在用户对 M5 不满意时进入。
@@ -63,7 +63,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 - HTML 兜底转换：`scripts/md_to_html.py`（无 modern-minimal-html 时使用，输出现代极简风结构化卡片布局）
 - 产物路径：`scripts/list_outputs.py`
 - 资产索引：`scripts/asset_index.py`
-- 可选出图：`scripts/gen_image.py`
+- 可选出图：`scripts/gen_image.py` — 支持 `--provider toapis`（Gemini 2.5 Flash）或 `--provider banana`
 - 可选视频：`scripts/gen_video_seedance.py`、`scripts/ffmpeg_concat.py`
 
 # 失败与降级

@@ -69,7 +69,7 @@ def build_brief(project_dir: Path) -> str:
 
 请使用 modern-minimal-html 的现代极简风格设计流程，为 game-greenlight 的立项报告设计并产出最终 `report/report.html`。
 
-使用 modern-minimal-html skill 的 CSS 变量体系 + 18 种组件模块，将 Markdown 报告转换为白底细框高密度的单文件 HTML。不使用 huashu-design。
+使用 modern-minimal-html skill 的 CSS 变量体系 + 18 种组件模块，将 Markdown 报告转换为白底细框高密度的单文件 HTML。
 
 ## 项目上下文
 

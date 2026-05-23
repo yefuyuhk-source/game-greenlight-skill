@@ -14,7 +14,7 @@ STEP_FILES = {
     "M4": ["concept.md", "shotlist.md", "project_state.json"],
     "M5": ["images/prompts.jsonl", "project_state.json"],
     "M6": ["video/storyboard.md", "video/final.mp4", "project_state.json"],
-    "M7": ["report/report.md", "report/report.html", "report/huashu_design_brief.md", "project_state.json"],
+    "M7": ["report/report.md", "report/report.html", "report/html_design_brief.md", "project_state.json"],
     "M8": ["images/prompts.jsonl", "project_state.json"],
 }
 

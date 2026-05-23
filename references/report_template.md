@@ -86,15 +86,15 @@ M7 固定输出一份报告：
 
 HTML 报告采用两级输出逻辑：
 
-1. 如果使用者环境存在 huashu-design：调用 huashu-design 执行定制排版。
-2. 如果使用者环境没有 huashu-design：使用内置结构化 HTML 兜底，尽量用卡片式布局、表格、重点摘要和关键画面卡片提高可读性。
+1. 如果使用者环境存在 modern-minimal-html：调用 modern-minimal-html 执行定制排版。
+2. 如果使用者环境没有 modern-minimal-html：使用内置结构化 HTML 兜底，用 modern-minimal-html 的 CSS 变量体系和组件模块产出白底细框高密度 HTML。
 
 推荐流程：
 
 1. 先生成 `report/report.md`。
 2. 运行 `scripts/check_design_backend.py --json`。
-3. 若返回 `backend = huashu-design`：运行 `scripts/build_huashu_brief.py {project_dir}`，再调用 huashu-design skill 产出最终 `report/report.html`。
-4. 若返回 `backend = structured-html`：运行 `scripts/md_to_html.py` 产出结构化卡片式兜底 HTML。
+3. 若返回 `backend = modern-minimal-html`：运行 `scripts/build_html_brief.py {project_dir}`，再调用 modern-minimal-html skill 产出最终 `report/report.html`。
+4. 若返回 `backend = structured-html`：运行 `scripts/md_to_html.py` 产出兜底 HTML。
 
 报告内容组织规则：
 

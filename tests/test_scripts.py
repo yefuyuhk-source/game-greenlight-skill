@@ -53,12 +53,11 @@ class ScriptTests(unittest.TestCase):
             source.write_text("# 标题\n\n🟢【已证据支持】结论\n", encoding="utf-8")
             self.run_script("scripts/md_to_html.py", str(source), str(target))
             html = target.read_text(encoding="utf-8")
-            self.assertIn("<h1>标题</h1>", html)
-            self.assertIn("tag-green", html)
-            self.assertIn("topbar", html)
-            self.assertIn("report-shell", html)
+            self.assertIn("title-main", html)
+            self.assertIn("标题", html)
+            self.assertIn("tag tt", html)
 
-    def test_md_to_html_table_no_chart(self) -> None:
+    def test_md_to_html_table(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp) / "scores.md"
             target = Path(tmp) / "scores.html"
@@ -68,28 +67,6 @@ class ScriptTests(unittest.TestCase):
             self.assertIn("table-card", html)
             self.assertNotIn("chart-card", html)
             self.assertNotIn("bar-fill", html)
-
-    def test_md_to_html_style_parameter(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            source = Path(tmp) / "report.md"
-            target = Path(tmp) / "report.html"
-            source.write_text("# 标题\n\n## 章节\n\n内容\n", encoding="utf-8")
-            self.run_script("scripts/md_to_html.py", str(source), str(target), "--style", "neo-shen")
-            html = target.read_text(encoding="utf-8")
-            self.assertIn("--accent: #c04a1a;", html)
-            self.assertIn("Noto Serif SC", html)
-
-    def test_md_to_html_auto_style_from_state(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            source = Path(tmp) / "report.md"
-            target = Path(tmp) / "report.html"
-            state = Path(tmp) / "project_state.json"
-            source.write_text("# 标题\n\n## 章节\n\n内容\n", encoding="utf-8")
-            state.write_text(json.dumps({"inputs": {"theme": "微恐", "art_style": ""}}, ensure_ascii=False), encoding="utf-8")
-            result = self.run_script("scripts/md_to_html.py", str(source), str(target), "--style", "auto", "--state", str(state))
-            html = target.read_text(encoding="utf-8")
-            self.assertIn("style=muller-brockmann", result.stdout)
-            self.assertIn("--accent: #ef4444;", html)
 
     def test_md_to_html_shot_cards_injection(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -133,14 +110,14 @@ class ScriptTests(unittest.TestCase):
             project = Path(tmp) / "outputs" / "demo_001"
             (project / "report").mkdir(parents=True)
             (project / "report" / "report.md").write_text("# report\n", encoding="utf-8")
-            (project / "report" / "huashu_design_brief.md").write_text("# brief\n", encoding="utf-8")
+            (project / "report" / "html_design_brief.md").write_text("# brief\n", encoding="utf-8")
             (project / "project_state.json").write_text("{}", encoding="utf-8")
             result = self.run_script("scripts/list_outputs.py", str(project), "--step", "M7", "--markdown")
             self.assertIn("report.md", result.stdout)
-            self.assertIn("huashu_design_brief.md", result.stdout)
+            self.assertIn("html_design_brief.md", result.stdout)
             self.assertIn("project_state.json", result.stdout)
 
-    def test_build_huashu_brief(self) -> None:
+    def test_build_html_brief(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             project = Path(tmp) / "outputs" / "demo_001"
             (project / "report").mkdir(parents=True)
@@ -161,10 +138,10 @@ class ScriptTests(unittest.TestCase):
                 json.dumps({"shot_id": "S1", "name": "主界面", "prompt_v1": "prompt"}, ensure_ascii=False) + "\n",
                 encoding="utf-8",
             )
-            result = self.run_script("scripts/build_huashu_brief.py", str(project))
+            result = self.run_script("scripts/build_html_brief.py", str(project))
             brief_path = Path(result.stdout.strip())
             brief = brief_path.read_text(encoding="utf-8")
-            self.assertIn("Huashu Design Brief", brief)
+            self.assertIn("Modern Minimal Design Brief", brief)
             self.assertIn("只保留项目名称", brief)
             self.assertIn("诡街守夜人", brief)
 
@@ -180,18 +157,18 @@ class ScriptTests(unittest.TestCase):
             )
             data = json.loads(result.stdout)
             self.assertEqual(data["backend"], "structured-html")
-            self.assertFalse(data["huashu_design_available"])
+            self.assertFalse(data["modern_minimal_available"])
 
     def test_check_design_backend_extra_root(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "skills"
-            skill = root / "huashu-design"
+            skill = root / "modern-minimal-html"
             skill.mkdir(parents=True)
-            (skill / "SKILL.md").write_text("---\nname: huashu-design\n---\n", encoding="utf-8")
+            (skill / "SKILL.md").write_text("---\nname: modern-minimal-html\n---\n", encoding="utf-8")
             result = self.run_script("scripts/check_design_backend.py", "--json", "--root", str(root))
             data = json.loads(result.stdout)
-            self.assertEqual(data["backend"], "huashu-design")
-            self.assertTrue(data["skill_path"].endswith("huashu-design/SKILL.md"))
+            self.assertEqual(data["backend"], "modern-minimal-html")
+            self.assertTrue(data["skill_path"].endswith("modern-minimal-html/SKILL.md"))
 
 
 if __name__ == "__main__":

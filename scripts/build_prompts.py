@@ -106,6 +106,8 @@ def extract_variables(state: dict[str, Any]) -> dict[str, str]:
     """从 project_state.concept.fields 提取变量字典。"""
     fields = state.get("concept", {}).get("fields", {})
     if not fields:
+        print("[build_prompts] ⚠️ 警告: project_state.concept.fields 为空，世界锚点将缺少主题上下文！", file=sys.stderr)
+        print("[build_prompts]   请确保 M4 已正确填写 fields（name, main_character, key_scene, theme_keywords 等）", file=sys.stderr)
         fields = {}
 
     def safe_str(val: Any) -> str:
@@ -313,19 +315,37 @@ def build_prompts(
     # 尝试精确匹配，再尝试模糊匹配（去掉空格/斜杠）
     category_config = cat.get(category_name)
     if not category_config:
-        # 模糊匹配
-        normalized_cat = category_name.replace("/", "").replace(" ", "")
+        # 模糊匹配（大小写不敏感）
+        normalized_cat = category_name.replace("/", "").replace(" ", "").lower()
         for key, val in cat.items():
-            if key.replace("/", "").replace(" ", "") == normalized_cat:
+            if key.replace("/", "").replace(" ", "").lower() == normalized_cat:
                 category_config = val
                 break
     if not category_config:
-        # 兜底品类
+        # 兜底品类：跳过低版本/日期等非 dict 值
+        first_category = None
+        for key, val in cat.items():
+            if isinstance(val, dict):
+                first_category = val
+                break
+        if first_category is None:
+            raise SystemExit(f"[build_prompts] 品类配置为空或格式错误")
         print(f"[build_prompts] 未找到品类 '{category_name}'，使用通用配置", file=sys.stderr)
-        category_config = next(iter(cat.values()))
+        category_config = first_category
 
     # 加载 project state
     state = load_project_state(project_dir)
+
+    # 步骤前置检查：M5 需在 M4 完成后运行
+    current_step = state.get("current_step", "")
+    valid_steps = ["M4", "M5", "M6", "M7", "M8"]
+    if current_step not in valid_steps:
+        raise SystemExit(
+            f"[build_prompts] 错误: 当前步骤 {current_step}，M5 提示词生成需在 M4 完成后运行。\n"
+            f"          请先完成 M4 立项初案（需包含 concept.fields 和 shotlist）。\n"
+            f"          可通过 `python scripts/state.py patch <project> --step M4 --patch ...` 手动设置。"
+        )
+
     variables = extract_variables(state)
 
     # 加载 shotlist

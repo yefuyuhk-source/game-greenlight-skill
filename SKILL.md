@@ -100,5 +100,5 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 
 - 用户说“暂停”：设置 `status = paused`。
 - 用户说“回到 Mx”：读取状态并从该步骤重跑，提醒后续产出需要刷新。
-- 新会话恢复：输出当前灯号、Top1 候选、下一步建议。
+- 新会话恢复：输出当前灯号、Top1 候选、下一步建议。**M5 前须确认 `project_state.concept.fields` 已填写完整（name, main_character, key_scene, theme_keywords 等），否则 world_context 世界锚点会丢失主题上下文。**
 - 任何步骤失败：写入 `errors[]`，不静默继续。

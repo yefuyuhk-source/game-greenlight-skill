@@ -1,3 +1,6 @@
-display_name: 游戏立项方向筛选
-short_description: 帮运营和策划快速生成游戏方向调研、候选选题和内部讨论报告。
-default_prompt: 帮我评估一个游戏立项方向，先做需求采集和关键词确认，再进入证据驱动调研。
+# [DEPRECATED] 旧版 Agent 配置
+# v0.5.1 起被三层 YAML 架构（prompt_base.yaml / category_prompts.yaml / slot_prompts.yaml）取代。
+# 保留仅作参考，不再使用。
+display_name: 游戏立项方向筛选（旧版）
+short_description: 已废弃 — 请使用 SKILL.md 中标准流程运行
+default_prompt: 此配置已废弃，请加载 game-greenlight-skill 的三层 YAML 流程

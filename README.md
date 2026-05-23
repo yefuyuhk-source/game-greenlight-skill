@@ -30,40 +30,49 @@
 ```
 game-greenlight-skill/
 ├── SKILL.md                  # 核心定义：流程、规则、约束
-├── references/               # 参考文档（9份）
+├── references/               # 参考文档（13份）
 │   ├── workflow.md           #   流程总述
 │   ├── research_protocol.md  #   调研协议
 │   ├── scoring_rubric.md     #   评分准则
 │   ├── state_schema.md       #   状态契约
 │   ├── report_template.md    #   报告模板
 │   ├── genre_taxonomy.md     #   品类分类
-│   ├── design_styles.md      #   美术风格库
+│   ├── shot_taxonomy.md      #   画面槽位分类词典
 │   ├── image_prompt_library.md  # 提示词库
-│   └── storyboard_patterns.md   # 分镜模式
-├── scripts/                  # 可用脚本（10个）
+│   ├── storyboard_patterns.md   # 分镜模式
+│   ├── m7-html-generation.md #   HTML 输出指南
+│   ├── prompt_base.yaml      #   三层提示词·基础层
+│   ├── category_prompts.yaml #   三层提示词·品类层
+│   └── slot_prompts.yaml     #   三层提示词·槽位层
+├── scripts/                  # 可用脚本（14个）
 │   ├── state.py              #   状态管理
 │   ├── search_web.py         #   联网搜索（Tavily）
 │   ├── fetch_url.py          #   网页抓取
+│   ├── build_prompts.py      #   三层提示词组装
+│   ├── polish_prompts.py     #   提示词润色（参考）
+│   ├── gen_image.py          #   出图（ToAPIs / Banana）
+│   ├── gen_video_seedance.py #   视频生成
+│   ├── ffmpeg_concat.py      #   视频拼接
 │   ├── md_to_html.py         #   Markdown → HTML
-│   ├── build_process_report.py   # 过程报告
+│   ├── build_html_brief.py   #   HTML 设计 brief
+│   ├── check_design_backend.py  # HTML 后端检测
 │   ├── list_outputs.py       #   产物路径列表
 │   ├── asset_index.py        #   资产索引
-│   ├── gen_image.py          #   出图
-│   ├── gen_video_seedance.py #   视频生成
-│   └── ffmpeg_concat.py      #   视频拼接
-├── assets/                   # 资源文件
-│   ├── prompt_snippets/      #   提示词片段
-│   └── style_presets/        #   风格预设
-├── agents/                   # Agent 配置
-│   └── openai.yaml           #   OpenAI GPT 配置
-├── tests/                    # 测试套件
-│   └── test_scripts.py       #   核心脚本测试（6/6通过）
+│   └── fetch_url.py          #   URL 正文抓取
+├── assets/                   # [DEPRECATED] 旧版风格预设，已被 category_prompts.yaml 取代
+│   └── style_presets/
+├── agents/                   # [DEPRECATED] 旧版 Agent 配置
+├── tests/                    # 测试套件（3 个文件，43+ tests）
+│   ├── test_scripts.py       #   核心脚本测试（6/6通过）
+│   ├── test_build_prompts.py #   提示词引擎测试（24 tests）
+│   └── test_category_schema.py # YAML 配置校验（19 tests）
+├── .github/workflows/        # CI 配置
 └── .gitignore
 ```
 
 ## 使用方式
 
-1. 在 AI Agent（Claude Code / OpenAI Codex / Hermes）中加载此 Skill
+1. 在 AI Agent（Claude Code / Hermes）中加载此 Skill
 2. 首次启动时确认 workspace 路径，默认 `~/game-greenlight-workspace`
 3. 项目产出写入 `{workspace}/outputs/{project_id}/`
 4. 每步开始前读取 `project_state.json`，结束后写回
@@ -71,8 +80,8 @@ game-greenlight-skill/
 
 ### 依赖
 - Python 3.10+
-- Tavily API Key（搜索脚本使用）
-- 可选：ffmpeg（视频拼接）、ComfyUI / Seedance（视频生成）
+- pyyaml、tavily
+- 可选：pytest（运行测试）
 
 ## 设计原则
 

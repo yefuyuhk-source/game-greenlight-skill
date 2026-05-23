@@ -1,4 +1,6 @@
 {
+  "_deprecated": true,
+  "_note": "v0.5.1 起不再使用。品类风格配置已迁移至 references/category_prompts.yaml 的 art_style / color_palette / default_subject 等字段。",
   "name": "default",
   "description": "通用游戏概念风格预设，作为无明确风格输入时的兜底。",
   "keywords": ["清晰轮廓", "可读性优先", "适合内部汇报", "高辨识度主视觉"]

@@ -70,6 +70,7 @@ def toapis_submit(api_key: str, prompt: str, size: str = "1:1",
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
+            "User-Agent": "game-greenlight/1.0",
         },
     )
     try:
@@ -85,7 +86,7 @@ def toapis_poll(api_key: str, task_id: str) -> dict | None:
     url = f"{TOAPIS_API_URL}/{task_id}"
     req = urllib.request.Request(
         url,
-        headers={"Authorization": f"Bearer {api_key}"},
+        headers={"Authorization": f"Bearer {api_key}", "User-Agent": "game-greenlight/1.0"},
     )
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
@@ -98,7 +99,7 @@ def toapis_poll(api_key: str, task_id: str) -> dict | None:
 def toapis_download(url: str) -> bytes | None:
     """下载生成的图片。"""
     try:
-        req = urllib.request.Request(url)
+        req = urllib.request.Request(url, headers={"User-Agent": "game-greenlight/1.0"})
         with urllib.request.urlopen(req, timeout=60) as resp:
             return resp.read()
     except Exception as exc:
@@ -168,8 +169,9 @@ def run_toapis(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
             print(f"[toapis] {shot_id} 状态: {status} ({progress}%)")
 
             if status == "completed":
-                # 从响应中提取图片 URL
-                images = status_data.get("images") or status_data.get("data") or []
+                # 从响应中提取图片 URL：result.data[0].url
+                result = status_data.get("result") or {}
+                images = result.get("data") or status_data.get("images") or status_data.get("data") or []
                 if isinstance(images, list) and images:
                     first = images[0]
                     if isinstance(first, dict):

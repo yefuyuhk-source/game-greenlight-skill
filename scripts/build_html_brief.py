@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -31,8 +32,9 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def rel(project_dir: Path, path: Path) -> str:
+    """返回 path 相对于 project_dir 的路径，支持 .. 前缀。"""
     try:
-        return str(path.relative_to(project_dir))
+        return str(Path(os.path.relpath(path.resolve(), project_dir.resolve())))
     except ValueError:
         return str(path)
 
@@ -52,13 +54,19 @@ def build_brief(project_dir: Path) -> str:
     prompt_rows = []
     for item in prompts:
         image = item.get("generated_image")
+        # 图片路径相对于 report/ 目录（HTML 输出位置）
+        if image:
+            image_abs = project_dir / image
+            image_rel = rel(project_dir / "report", image_abs)
+        else:
+            image_rel = None
         prompt_rows.append(
             {
                 "shot_id": item.get("shot_id"),
                 "name": item.get("name") or item.get("title"),
                 "render_mode": item.get("render_mode"),
                 "image": image,
-                "image_path": rel(project_dir, project_dir / image) if image else None,
+                "image_path": image_rel,
                 "prompt": item.get("prompt_v1") or item.get("prompt"),
             }
         )

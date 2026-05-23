@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import os
 import re
 from pathlib import Path
 
@@ -199,7 +200,7 @@ def load_prompts(path: Path | None) -> list[dict]:
     return prompts
 
 
-def shot_cards_from_prompts(prompts: list[dict]) -> str:
+def shot_cards_from_prompts(prompts: list[dict], image_prefix: str = "") -> str:
     if not prompts:
         return ""
     cards = []
@@ -208,11 +209,13 @@ def shot_cards_from_prompts(prompts: list[dict]) -> str:
         name = item.get("name", shot_id)
         prompt = item.get("prompt_v1") or item.get("prompt") or ""
         image = item.get("generated_image") or ""
+        if image and image_prefix:
+            image = f"{image_prefix}/{image}" if not image.startswith(("http", "/", "data:")) else image
         cards.append(shot_card_to_html(shot_id, name, prompt, image))
     return "\n".join(cards)
 
 
-def convert(markdown: str, prompts: list[dict] | None = None) -> str:
+def convert(markdown: str, prompts: list[dict] | None = None, image_prefix: str = "") -> str:
     lines = markdown.splitlines()
     out: list[str] = []
     table_lines: list[str] = []
@@ -229,7 +232,7 @@ def convert(markdown: str, prompts: list[dict] | None = None) -> str:
         # {{SHOT_CARDS}} 占位
         if line.strip() == "{{SHOT_CARDS}}" and prompts:
             flush_table()
-            out.append(shot_cards_from_prompts(prompts))
+            out.append(shot_cards_from_prompts(prompts, image_prefix))
             continue
         if line.startswith("```"):
             if in_code:
@@ -315,9 +318,17 @@ def main() -> None:
     source = Path(args.input)
     target = Path(args.output)
     prompts = load_prompts(Path(args.prompts) if args.prompts else None)
+
+    # 计算图片路径前缀：从 HTML 所在目录回到项目根目录
+    cwd = Path.cwd()
+    try:
+        image_prefix = Path(os.path.relpath(cwd, target.parent.resolve()))
+    except ValueError:
+        image_prefix = Path("..")
+
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(
-        convert(source.read_text(encoding="utf-8"), prompts), encoding="utf-8"
+        convert(source.read_text(encoding="utf-8"), prompts, str(image_prefix))
     )
     print(target)
 

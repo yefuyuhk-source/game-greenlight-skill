@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """图像 provider 统一入口。
 
+支持从品类 YAML 读取 model_route 参数。
+
 支持的 provider:
 - toapis: 调用 ToAPIs Gemini 2.5 Flash Image API（异步任务，自动轮询）
 - banana: 调用 Banana.dev serverless GPU API（Stable Diffusion）
@@ -19,6 +21,9 @@ import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
+
+import yaml
 
 
 TOAPIS_API_URL = "https://toapis.com/v1/images/generations"
@@ -32,6 +37,41 @@ ASPECT_MAP = {
     "4:3": "4:3",
     "3:4": "3:4",
 }
+
+
+# ── 品类配置加载 ──────────────────────────────────────────────────────
+
+
+def find_skill_root() -> Path:
+    """向上寻找包含 references/ 目录的 skill 根目录。"""
+    start = Path(__file__).resolve().parent.parent  # scripts/..
+    for candidate in [start, start.parent]:
+        ref_dir = candidate / "references"
+        if ref_dir.is_dir():
+            return candidate
+    ref_dir = start / "references"
+    if ref_dir.is_dir():
+        return start
+    raise SystemExit("无法定位 references/ 目录")
+
+
+def load_category_config(category_name: str) -> dict[str, Any]:
+    """从 category_prompts.yaml 加载指定品类的 model_route 等配置。"""
+    cat_path = find_skill_root() / "references" / "category_prompts.yaml"
+    if not cat_path.exists():
+        return {}
+    with open(cat_path, "r", encoding="utf-8") as f:
+        cat = yaml.safe_load(f) or {}
+    # 精确匹配
+    config = cat.get(category_name)
+    if not config:
+        # 模糊匹配
+        normalized = category_name.replace("/", "").replace(" ", "")
+        for key, val in cat.items():
+            if key.replace("/", "").replace(" ", "") == normalized:
+                config = val
+                break
+    return config or {}
 
 
 def now_iso() -> str:
@@ -133,7 +173,7 @@ def run_toapis(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
         # 消毒：防止路径穿越
         safe_id = re.sub(r"[/\\]+", "_", str(shot_id)).strip(".")
         name = item.get("name", shot_id)
-        prompt = item.get("prompt_v1") or item.get("prompt") or ""
+        prompt = item.get("prompt_v2") or item.get("prompt_v1") or item.get("prompt") or ""
         render_mode = item.get("render_mode", "mobile_screenshot")
         size = resolve_size(render_mode)
 
@@ -290,7 +330,7 @@ def run_banana(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
         # 消毒：防止路径穿越
         safe_id = re.sub(r"[/\\]+", "_", str(shot_id)).strip(".")
         name = item.get("name", shot_id)
-        prompt = item.get("prompt_v1") or item.get("prompt") or ""
+        prompt = item.get("prompt_v2") or item.get("prompt_v1") or item.get("prompt") or ""
         negative = item.get("negative") or ""
         render_mode = item.get("render_mode", "mobile_screenshot")
 
@@ -329,6 +369,8 @@ def main() -> None:
     parser.add_argument("--prompts", required=True, help="images/prompts.jsonl")
     parser.add_argument("--provider", default=os.environ.get("IMAGE_PROVIDER"))
     parser.add_argument("--output-dir", default=None)
+    parser.add_argument("--category", default=None,
+                        help="品类名，从 category_prompts.yaml 读取 model_route 参数")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -343,6 +385,7 @@ def main() -> None:
                     "ok": True,
                     "dry_run": True,
                     "provider": args.provider or "none",
+                    "category": args.category,
                     "prompt_count": len(prompts),
                     "output_dir": str(output_dir),
                     "time": now_iso(),

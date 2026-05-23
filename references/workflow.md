@@ -51,14 +51,19 @@
 
 ## M5 关键画面提示词
 
-1. 默认只生成 `images/prompts.jsonl`。
-2. 默认目标是”手游实际画面截图”，用于验证玩法、UI、战斗可读性和项目可行性。
-3. 只有主视觉、宣传图、纯氛围场景允许使用概念图 / key visual / scene concept 表达。
-4. 每张图包含用途、`render_mode`、构图、视觉关键词、provider 建议、正向 prompt、negative prompt。
-5. 用户显式说”开始出图”或配置 `BANANA_API_KEY` + `BANANA_MODEL_KEY` 后调用：
+1. 运行 `python scripts/build_prompts.py --project <project_dir> --category <品类名>`
+   自动完成：三层 YAML 组装 → 生成 `images/prompts.jsonl`（含 prompt_v1 结构化拼接）。
+   **主题一致性**：所有提示词以 `prompt_base.yaml` 的 `world_context.template` 为锚点开头，
+   保证 S1-S10 统一在本项目世界观下，不会脱节或主题错乱。
+2. 加 `--polish` 参数会输出**全部提示词**的润色清单，由 AI 助手在会话中逐条润色并写入 `prompt_v2`。
+   无需外部 API key，直接用当前大模型完成润色（S1/S2/S5 标 ⭐ 精细润色）。
+3. 默认目标是"手游实际画面截图"，用于验证玩法、UI、战斗可读性和项目可行性。
+4. 只有主视觉、宣传图、纯氛围场景（`with_ui: false`）允许使用概念图 / key visual / scene concept 表达。
+5. 用户显式说"开始出图"或配置 `TOAPIS_API_KEY` 后调用：
    ```bash
-   python scripts/gen_image.py --prompts <project>/images/prompts.jsonl --provider banana --output-dir <project>/images
+   python scripts/gen_image.py --prompts <project>/images/prompts.jsonl --provider toapis --output-dir <project>/images --category <品类名>
    ```
+   出图时优先使用 `prompt_v2`（如有），否则用 `prompt_v1`。
    生成的图片路径写入 `prompts.jsonl` 的 `generated_image` 字段。
 6. 对话中返回 `images/prompts.jsonl` 与 `project_state.json` 的路径。
 
@@ -89,6 +94,15 @@
    兜底 HTML 使用 modern-minimal-html 的 CSS 变量体系 + 组件模块（白底细框高密度），并在对话中说明"HTML 为兜底版，非 modern-minimal-html 定制版"。
 6. 若联网失败降级，报告封面必须提示证据不足。
 7. 对话中返回 `report/report.md`、`report/report.html`、可选 `report/html_design_brief.md` 与 `project_state.json` 的路径。
+8. **产物汇总**：M7 完成后运行以下命令展示所有最终产物，包含中文标题与路径：
+   ```bash
+   python scripts/list_outputs.py <project_dir> --step M7 --markdown
+   ```
+   输出示例：
+   - **立项报告（Markdown）**：`<project_dir>/report/report.md`
+   - **立项报告（HTML）**：`<project_dir>/report/report.html`
+   - **关键画面提示词**：`<project_dir>/images/prompts.jsonl`
+   对话回复中保留所有最终产物的绝对路径，供用户直接打开或定位。
 
 ## M8 风格迭代
 

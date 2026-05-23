@@ -38,10 +38,31 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 2. M2 证据驱动调研：必须遵守 `references/research_protocol.md`。
 3. M3 选题推荐：必须遵守 `references/scoring_rubric.md`。
 4. M4 立项初案：生成 `concept.md`，按 `references/shot_taxonomy.md` 槽位规则生成 `shotlist.md`（6 固定核心 + 2~3 品类替换 + 1 可选社交），填写四条 `direction_hypotheses`。
-5. M5 关键画面提示词：默认只生成 `images/prompts.jsonl`。配置 `TOAPIS_API_KEY` 后调用 `scripts/gen_image.py --provider toapis` 可实际出图（Gemini 2.5 Flash Image），图片写入 `generated_image` 字段。除主视觉、宣传图、纯氛围场景外，提示词必须以"手游实际画面截图"为目标，包含 UI、镜头、布局和可读玩法信息，用来判断项目是否可行。
+5. M5 关键画面提示词：
+   - 运行 `python scripts/build_prompts.py --project {project_dir} --category <品类名>`
+     → 自动完成：三层 YAML 组装 → 生成 `images/prompts.jsonl`（含 prompt_v1 结构化拼接）
+   - **主题一致性**：所有提示词以 `prompt_base.yaml` 的 `world_context.template` 为锚点开头，保证 S1-S10 统一在本项目世界观下，不会脱节或主题错乱
+   - 加 `--polish` 参数会输出**全部提示词**的润色清单，由 AI 助手在会话中逐条润色并写入 `prompt_v2`
+     → 无需外部 API key，直接用当前大模型完成润色（S1/S2/S5 标 ⭐ 精细润色）
+   - 默认目标是"手游实际画面截图"...
+   - 只有主视觉、宣传图、纯氛围场景（`with_ui: false`）允许使用概念图表达
+   - 用户显式说"开始出图"或配置 `TOAPIS_API_KEY` 后调用：
+     ```
+     python scripts/gen_image.py --prompts <project>/images/prompts.jsonl --provider toapis --output-dir <project>/images --category <品类名>
+     ```
+     出图时优先使用 `prompt_v2`（如有），否则用 `prompt_v1`
+   - 对话中返回 `images/prompts.jsonl` 与 `project_state.json` 的路径
 6. M6 演示视频分镜：默认只生成 `video/storyboard.md`。
 7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 输出先检测设计后端（`modern-minimal-html`），有则调用它定制排版，没有时使用内置结构化卡片式 HTML 兜底（`scripts/md_to_html.py`）。
-8. M8 风格迭代：只在用户对 M5 不满意时进入。
+8. **产物汇总**：M7 完成后运行以下命令展示所有最终产物，包含中文标题与路径：
+   ```bash
+   python scripts/list_outputs.py {workspace}/outputs/{project_id} --step M7 --markdown
+   ```
+   输出示例：
+   - **立项报告（Markdown）**：`~/game-greenlight-workspace/outputs/xxx/report/report.md`
+   - **立项报告（HTML）**：`~/game-greenlight-workspace/outputs/xxx/report/report.html`
+   对话回复中保留所有最终产物的绝对路径，供用户直接打开。
+9. M8 风格迭代：只在用户对 M5 不满意时进入。
 
 # 判断标签
 

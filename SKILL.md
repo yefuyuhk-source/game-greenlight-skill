@@ -63,9 +63,8 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
      ```
      python scripts/gen_image.py --prompts <project>/images/prompts.jsonl --provider toapis --output-dir <project>/images --category <品类名>
      ```
-     出图时优先使用 `prompt_v2`（如有），否则用 `prompt_v1`
-     - Gemini 3.1 Flash 出图：将 `--provider toapis` 替换为 `--provider toapis31`
-   - 对话中返回 `images/prompts.jsonl` 与 `project_state.json` 的路径
+    出图时优先使用 `prompt_v2`（如有），否则用 `prompt_v1`。默认使用 **Gemini 3.1 Flash**，如需回退到 2.5 Flash 用 `--toapis-model gemini-2.5-flash-image-preview`。
+  - 对话中返回`images/prompts.jsonl` 与 `project_state.json` 的路径
 6. M6 演示视频分镜：默认只生成 `video/storyboard.md`。
 7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 输出先检测设计后端（`modern-minimal-html`），有则调用它定制排版，没有时使用内置结构化卡片式 HTML 兜底（`scripts/md_to_html.py`）。
 8. **产物汇总**：M7 完成后运行以下命令展示所有最终产物，包含中文标题与路径：
@@ -99,6 +98,8 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 - 产物路径：`scripts/list_outputs.py`
 - 资产索引：`scripts/asset_index.py`
 - 可选出图：`scripts/gen_image.py` — 支持 `--provider toapis`（Gemini 2.5 Flash）、`--provider toapis31`（Gemini 3.1 Flash）或 `--provider banana`
+  - 模型优先级：`--toapis-model` 参数 > `TOAPIS_MODEL` 环境变量 > provider 默认模型
+  - 新增 provider：在 `main()` 中添加 provider 分支，调用 `run_toapis(prompts_path, output_dir, model=...)` 复用同一异步轮询逻辑
 - 可选视频：`scripts/gen_video_seedance.py`、`scripts/ffmpeg_concat.py`
 
 # 失败与降级

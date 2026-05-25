@@ -4,8 +4,8 @@
 支持从品类 YAML 读取 model_route 参数。
 
 支持的 provider:
-- toapis:   调用 ToAPIs Gemini 2.5 Flash Image API（异步任务，自动轮询，默认）
-- toapis31: 调用 ToAPIs Gemini 3.1 Flash Image API（异步任务，自动轮询）
+- toapis:   调用 ToAPIs 图像生成 API（默认 Gemini 3.1 Flash，异步任务，自动轮询）
+- toapis31: 调用 ToAPIs Gemini 3.1 Flash Image API（显式别名）
 - banana:   调用 Banana.dev serverless GPU API（Stable Diffusion）
 - 未配置时降级为仅生成提示词
 
@@ -100,7 +100,7 @@ def save_prompts(path: Path, prompts: list[dict]) -> None:
 
 
 def toapis_submit(api_key: str, prompt: str, size: str = "1:1",
-                  model: str = "gemini-2.5-flash-image-preview") -> dict | None:
+                  model: str = "gemini-3.1-flash-image-preview") -> dict | None:
     """提交图像生成任务，返回任务响应 JSON。"""
     payload = {
         "model": model,
@@ -168,7 +168,7 @@ def run_toapis(prompts_path: Path, output_dir: Path, model: str = "") -> tuple[l
         raise SystemExit("缺少 TOAPIS_API_KEY 环境变量")
 
     # 模型名优先级：参数 > 环境变量 > 默认
-    model = model or os.environ.get("TOAPIS_MODEL") or "gemini-2.5-flash-image-preview"
+    model = model or os.environ.get("TOAPIS_MODEL") or "gemini-3.1-flash-image-preview"
 
     prompts = load_prompts(prompts_path)
     output_dir.mkdir(parents=True, exist_ok=True)

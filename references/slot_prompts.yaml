@@ -14,6 +14,8 @@ S1:
   slot_type: fixed
   with_ui: false
   llm_polish: true
+  zone_strategy: "营销引流"
+  aspect_ratio: "16:9"
   composition: "hero composition with dynamic pose, eye-catching focal point, balanced negative space for title placement"
   subject_template: "{main_character} alongside {characters} in {key_scene}, {atmosphere_keyword} atmosphere, dramatic heroic lighting"
   camera_override: "promotional KV angle, slightly cinematic but maintaining game-stylized aesthetic"
@@ -38,6 +40,8 @@ S2:
   slot_type: fixed
   with_ui: false
   llm_polish: true
+  zone_strategy: "世界观展示"
+  aspect_ratio: "16:9"
   composition: "wide establishing shot, atmospheric environmental storytelling, props and architecture that reveal the world"
   subject_template: "{landmark_scene} in {game_name}, {atmosphere_keyword} atmosphere, {color_preference} color palette, environmental storytelling"
   camera_override: "wide angle, environmental focus, no character closeup"
@@ -60,6 +64,8 @@ S3:
   slot_type: fixed
   with_ui: true
   llm_polish: false
+  zone_strategy: "主场景展示"
+  aspect_ratio: "9:16"
   composition: "central hub background with mode entrance buttons, resource bar at top, event banner"
   subject_template: "{game_name} main menu, {key_scene} visible in background, player avatar and resources displayed, mode selection buttons"
   camera_override: "frontal UI view, no 3D camera angle"
@@ -86,6 +92,8 @@ S4:
   slot_type: fixed
   with_ui: true
   llm_polish: false
+  zone_strategy: "玩法展示"
+  aspect_ratio: "9:16"
   composition: "gameplay view with player units and enemies, action in progress, clear battle UI layout"
   subject_template: "{game_name} core gameplay, {enemy_type} encounter in {key_scene}, player units deployed at strategic positions"
   camera_override: "standard gameplay perspective (top-down / isometric / side-view as appropriate for genre)"
@@ -114,6 +122,8 @@ S5:
   slot_type: fixed
   with_ui: true
   llm_polish: true
+  zone_strategy: "高潮爽感"
+  aspect_ratio: "9:16"
   composition: "oversized boss encounter, dramatic moment, high tension but gameplay still readable"
   subject_template: "{boss_description} boss fight in {key_scene}, {main_character} leading the assault, {atmosphere_keyword} climax moment, high stakes"
   camera_override: "slightly dramatic angle but maintaining gameplay readability and UI visibility"
@@ -135,6 +145,8 @@ S6:
   slot_type: fixed
   with_ui: true
   llm_polish: false
+  zone_strategy: "收集欲望"
+  aspect_ratio: "9:16"
   composition: "character roster or upgrade tree with stats, levels and progression milestones"
   subject_template: "{game_name} character progression, {main_character} upgrade screen with skill tree and equipment slots, resource costs displayed"
   camera_override: "frontal UI view, interface screenshot style"
@@ -163,6 +175,8 @@ S10:
   with_ui: true
   llm_polish: false
   enabled_when: "category.social_slot_enabled == true"
+  zone_strategy: "功能说明"
+  aspect_ratio: "9:16"
   composition: "social interaction interface with list panel and detail panel layout"
   subject_template: "{game_name} social hub, guild or friend system with member roster, chat panel and interaction options"
   camera_override: "frontal UI screenshot, no 3D scene"

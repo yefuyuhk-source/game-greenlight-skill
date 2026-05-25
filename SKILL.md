@@ -39,11 +39,23 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 3. M3 选题推荐：必须遵守 `references/scoring_rubric.md`。
 4. M4 立项初案：生成 `concept.md`，按 `references/shot_taxonomy.md` 槽位规则生成 `shotlist.md`（6 固定核心 + 2~3 品类替换 + 1 可选社交），填写四条 `direction_hypotheses`。
 5. M5 关键画面提示词：
-   - 运行 `python scripts/build_prompts.py --project {project_dir} --category <品类名>`
-     → 自动完成：三层 YAML 组装 → 生成 `images/prompts.jsonl`（含 prompt_v1 结构化拼接）
-   - **主题一致性**：所有提示词以 `prompt_base.yaml` 的 `world_context.template` 为锚点开头，保证 S1-S10 统一在本项目世界观下，不会脱节或主题错乱
-   - 加 `--polish` 参数会输出**全部提示词**的润色清单，由 AI 助手在会话中逐条润色并写入 `prompt_v2`
-     → 无需外部 API key，直接用当前大模型完成润色（S1/S2/S5 标 ⭐ 精细润色）
+   - **推荐路径**（LLM 原生生成）：
+     a. 运行 `python scripts/build_prompts.py --project {project_dir} --category <品类名> --context-only`
+        → 加载三层 YAML 知识库 + project_state 变量 → 为每条 shot 生成结构化上下文卡片
+        → `prompt_v1` 字段存储上下文卡片（供 concept-prompt-architecture skill 消费），metadata + negative 照常生成
+        → 输出 `images/prompts.jsonl`
+     b. 调用 `concept-prompt-architecture` skill：
+        → 逐条读取 JSONL 中每个 shot 的上下文卡片（prompt_v1）
+        → 按 4 层写作法 + 分区策略 + 8 条自检生成高质量英文 prompt
+        → 写入 `prompt_v2` 字段，标记 `iteration_tag: "v2"`
+     c. 若会话中无法调用 skill，AI 助手可直接基于上下文卡片推理生成（效果略逊但仍优于碎片拼接）
+   - **兼容路径**（原有碎片拼接）：
+     运行 `python scripts/build_prompts.py --project {project_dir} --category <品类名> --legacy`
+     → 完全等同于修改前的行为（碎片拼接 prompt_v1，--polish 输出润色清单）
+   - **主题一致性**：
+     - 上下文卡片包含 world_context anchor（来自 `prompt_base.yaml` 的 `world_context.template` 展开），保证 S1-S10 统一世界观
+     - concept-prompt-architecture 的自检第 7 条（系列感）通过 SERIES CONTEXT 提示进一步强化跨 shot 视觉锚点共享
+     - 负向提示词（negative）仍由 build_prompts.py 三层累加生成，不受影响
    - 默认目标是"手游实际画面截图"...
    - 只有主视觉、宣传图、纯氛围场景（`with_ui: false`）允许使用概念图表达
    - 用户显式说"开始出图"或配置 `TOAPIS_API_KEY` 后调用：

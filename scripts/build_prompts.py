@@ -297,6 +297,160 @@ def assemble_negative(
     return ", ".join(clean)
 
 
+# ── concept-prompt-architecture 上下文卡片 ──────────────────────────────
+
+def derive_zone_strategy(shot_id: str, shot_name: str, with_ui: bool, purpose: str, slot: dict[str, Any]) -> str:
+    """根据 shot 用途推导 concept-prompt-architecture 的 7 种分区策略。
+
+    优先使用 slot 中预定义的 zone_strategy 字段，
+    否则根据 shot_id、with_ui、purpose 推断。
+    """
+    # 优先用 YAML 中预定义的 zone_strategy
+    if slot.get("zone_strategy"):
+        return slot["zone_strategy"]
+
+    # 按 shot_id 固定映射
+    strategies = {
+        "S1": "营销引流",     # 叙事+构图分区
+        "S2": "世界观展示",   # 空间层次分区
+        "S3": "主场景展示",   # 场景+UI混合分区
+        "S4": "玩法展示",     # 功能逻辑分区
+        "S5": "高潮爽感",     # 叙事张力分区
+        "S6": "收集欲望",     # 信息层级分区
+        "S10": "功能说明",    # 屏幕区域分区
+    }
+    if shot_id in strategies:
+        return strategies[shot_id]
+
+    # S7-S9: 根据 purpose/name 推断
+    purpose_lower = (purpose + shot_name).lower()
+    if any(kw in purpose_lower for kw in ["战斗", "combat", "玩法", "gameplay", "副本", "对局", "关卡", "节奏"]):
+        return "玩法展示"
+    if any(kw in purpose_lower for kw in ["角色", "character", "养成", "收集", "装备", "英雄", "卡牌", "武器", "好感"]):
+        return "收集欲望"
+    if any(kw in purpose_lower for kw in ["场景", "全景", "世界", "scene", "landscape", "world", "剧情", "cg"]):
+        return "世界观展示"
+    if any(kw in purpose_lower for kw in ["kv", "视觉", "海报", "poster", "合影", "演出", "舞台"]):
+        return "营销引流"
+    if any(kw in purpose_lower for kw in ["boss", "高潮", "climax", "危机", "night"]):
+        return "高潮爽感"
+    if any(kw in purpose_lower for kw in ["界面", "地图", "map", "系统", "社交", "ui", "menu", "建造", "合成", "制作", "订单", "选", "进度"]):
+        return "功能说明"
+
+    return "主场景展示"  # 兜底
+
+
+def build_context_card(
+    shot: dict[str, Any],
+    slot: dict[str, Any],
+    cat: dict[str, Any],
+    base: dict[str, Any],
+    variables: dict[str, str],
+    shot_index: int,
+    total_shots: int,
+) -> str:
+    """生成结构化英文上下文卡片，供 concept-prompt-architecture skill 消费。"""
+    with_ui = slot.get("with_ui", True)
+    zone_strategy = derive_zone_strategy(
+        shot.get("id", ""), shot.get("name", ""), with_ui, shot.get("purpose", ""), slot,
+    )
+
+    # 画幅
+    aspect_ratio = slot.get("aspect_ratio", "9:16" if with_ui else "16:9")
+
+    # 渲染模式
+    if not with_ui:
+        render_mode = "concept_allowed — pure illustration, no UI elements"
+    else:
+        render_mode = shot.get("render_mode", "mobile_screenshot")
+
+    # 图像类型推断
+    image_type_map = {
+        "营销引流": "key art poster",
+        "世界观展示": "establishing shot / scene concept",
+        "主场景展示": "screen mockup with scene + UI overlay",
+        "玩法展示": "gameplay screen capture",
+        "高潮爽感": "boss battle / climax screen",
+        "收集欲望": "character progression / collection screen",
+        "功能说明": "UI interface screenshot",
+    }
+    image_type = image_type_map.get(zone_strategy, "game screenshot")
+
+    # 世界锚点
+    world_tmpl = base.get("world_context", {}).get("template", "")
+    world_anchor = fill_template(world_tmpl, variables, fallback="") if world_tmpl else ""
+
+    # 系列上下文
+    series_tmpl = base.get("concept_prompt_architecture_series_context", "")
+    if series_tmpl:
+        series_context = series_tmpl.format(
+            shot_index=shot_index,
+            total_shots=total_shots,
+            game_name=variables.get("game_name", "this game"),
+        )
+    else:
+        series_context = (
+            f"This is shot {shot_index} of {total_shots} concept images for "
+            f"{variables.get('game_name', 'this game')}. "
+            "Share 1-2 visual anchor elements with other shots in the series."
+        )
+
+    # 组装 must_include / must_exclude
+    must_include = slot.get("must_include", [])
+    must_exclude = slot.get("must_exclude", [])
+
+    # 组装上下文卡片
+    lines = []
+    lines.append(f"=== SHOT CONTEXT: {shot.get('id', 'S?')} - {slot.get('name', '')} ===")
+    lines.append(f"GAME: {variables.get('game_name', 'Unknown')}")
+    if world_anchor:
+        lines.append(f"WORLD ANCHOR: {world_anchor}")
+    lines.append(f"MAIN CHARACTER: {variables.get('main_character', 'N/A')}")
+    lines.append(f"FEATURED CHARACTER: {variables.get('featured_character', 'N/A')}")
+    lines.append(f"LANDMARK SCENE: {variables.get('landmark_scene', 'N/A')}")
+    lines.append(f"COLOR PREFERENCE: {variables.get('color_preference', 'N/A')}")
+    lines.append("")
+    lines.append(f"IMAGE TYPE: {image_type}")
+    lines.append(f"FIRST PURPOSE: {zone_strategy}")
+    lines.append(f"ZONE STRATEGY: {zone_strategy}")
+    lines.append(f"ASPECT RATIO: {aspect_ratio}")
+    lines.append(f"WITH UI: {str(with_ui).lower()}")
+    lines.append(f"RENDER MODE: {render_mode}")
+    lines.append(f"PURPOSE: {shot.get('purpose', '')}")
+    lines.append("")
+    lines.append(f"ART STYLE: {cat.get('art_style', '')}")
+    lines.append(f"COLOR PALETTE: {cat.get('color_palette', '')}")
+    lines.append(f"DEFAULT CAMERA: {cat.get('default_camera', '')}")
+    if with_ui:
+        lines.append(f"UI AESTHETIC: {cat.get('ui_aesthetic', '')}")
+    lines.append("")
+    lines.append(f"COMPOSITION GUIDANCE: {slot.get('composition', '')}")
+    lines.append(f"SUBJECT DESCRIPTION: {fill_template(slot.get('subject_template', ''), variables, fallback=cat.get('default_subject', ''))}")
+    camera = slot.get('camera_override', '') or cat.get('default_camera', '')
+    if camera:
+        lines.append(f"CAMERA: {camera}")
+    if with_ui and slot.get('ui_layout'):
+        lines.append(f"UI LAYOUT: {slot.get('ui_layout', '')}")
+    lines.append("")
+    if must_include:
+        lines.append("MUST INCLUDE:")
+        for item in must_include:
+            lines.append(f"  - {item}")
+    if must_exclude:
+        lines.append("MUST EXCLUDE:")
+        for item in must_exclude:
+            lines.append(f"  - {item}")
+    detail_checklist = slot.get("detail_checklist", [])
+    if detail_checklist:
+        lines.append("DETAIL CHECKLIST:")
+        for item in detail_checklist:
+            lines.append(f"  - {item}")
+    lines.append("")
+    lines.append(f"SERIES CONTEXT: {series_context}")
+
+    return "\n".join(lines)
+
+
 # ── 主流程 ────────────────────────────────────────────────────────────
 
 def build_prompts(
@@ -304,6 +458,7 @@ def build_prompts(
     category_name: str,
     skill_root: Path,
     dry_run: bool = False,
+    context_only: bool = False,
 ) -> list[dict[str, Any]]:
     """组装所有提示词。"""
     # 加载配置
@@ -356,7 +511,8 @@ def build_prompts(
 
     # 组装每条提示词
     prompts = []
-    for shot in shotlist:
+    total_shots = len(shotlist)
+    for idx, shot in enumerate(shotlist):
         shot_id = shot.get("id", "S?")
         shot_name = shot.get("name", "")
 
@@ -364,7 +520,13 @@ def build_prompts(
         with_ui = slot.get("with_ui", True)
         llm_polish = slot.get("llm_polish", False)
 
-        prompt_text = assemble_prompt(shot, slot, category_config, base, variables)
+        if context_only:
+            prompt_text = build_context_card(
+                shot, slot, category_config, base, variables, idx + 1, total_shots,
+            )
+            llm_polish = True  # context-only 下所有 shot 都需要 LLM 生成
+        else:
+            prompt_text = assemble_prompt(shot, slot, category_config, base, variables)
         negative_text = assemble_negative(shot, slot, category_config, base)
 
         # 提取 render_mode
@@ -430,19 +592,27 @@ def main() -> None:
     parser.add_argument("--category", required=True, help="品类名（如 模拟经营、SLG策略战争）")
     parser.add_argument("--output", default=None, help="prompts.jsonl 输出路径，缺省为 project/images/prompts.jsonl")
     parser.add_argument("--polish", action="store_true", help="输出全部提示词的润色清单（由 AI 助手在会话中完成润色，无需外部 API key）")
+    parser.add_argument("--context-only", action="store_true", help="生成上下文卡片（prompt_v1）供 concept-prompt-architecture skill 消费，而非碎片拼接")
+    parser.add_argument("--legacy", action="store_true", help="使用原有碎片拼接模式（显式开关，与 --context-only 互斥）")
     parser.add_argument("--dry-run", action="store_true", help="仅预览，不写入文件")
     args = parser.parse_args()
 
     project_dir = find_project_dir(args.project)
     skill_root = find_skill_root()
 
-    prompts = build_prompts(project_dir, args.category, skill_root, dry_run=args.dry_run)
+    context_only = args.context_only
+
+    prompts = build_prompts(
+        project_dir, args.category, skill_root,
+        dry_run=args.dry_run, context_only=context_only,
+    )
 
     if args.dry_run:
         print_json({
             "ok": True,
             "dry_run": True,
             "category": args.category,
+            "mode": "context-only" if context_only else "legacy",
             "prompt_count": len(prompts),
             "prompts": prompts,
         })
@@ -451,8 +621,24 @@ def main() -> None:
     output_path = Path(args.output) if args.output else project_dir / "images" / "prompts.jsonl"
     write_prompts(output_path, prompts)
 
-    # 组装后自动润色（由 AI 助手在会话中完成）
-    if args.polish:
+    # context-only 模式：提示用户在会话中调用 concept-prompt-architecture skill
+    if context_only:
+        if prompts:
+            print("[build_prompts] ════════════════════════════════════════════")
+            print(f"[build_prompts] context-only 模式：已生成 {len(prompts)} 条上下文卡片 -> prompt_v1")
+            print("[build_prompts]")
+            print("[build_prompts] 下一步：调用 concept-prompt-architecture skill")
+            print("[build_prompts]   逐条读取 JSONL 中每个 shot 的 prompt_v1（上下文卡片）")
+            print("[build_prompts]   → 按 4 层写作法 + 分区策略 + 8 条自检生成英文 prompt")
+            print("[build_prompts]   → 写入 prompt_v2 字段，标记 iteration_tag: 'v2'")
+            print("[build_prompts]")
+            for p in prompts:
+                print(f"[build_prompts]   {p['shot_id']} «{p.get('name', '')}» — zone: {derive_zone_strategy(p['shot_id'], p.get('name', ''), p.get('with_ui', True), p.get('purpose', ''), {})}")
+            print("[build_prompts] ════════════════════════════════════════════")
+        else:
+            print("[build_prompts] 没有需要处理的槽位")
+    elif args.polish:
+        # legacy 模式下 --polish 的原有行为
         if prompts:
             print("[build_prompts] ════════════════════════════════════════════")
             print(f"[build_prompts] 全部 {len(prompts)} 个槽位需 LLM 二次润色（由 AI 助手处理）：")
@@ -471,11 +657,12 @@ def main() -> None:
     print_json({
         "ok": True,
         "category": args.category,
+        "mode": "context-only" if context_only else "legacy",
         "prompt_count": len(prompts),
         "output": str(output_path),
     })
 
-    # 列出全部需 LLM 二次润色的槽位
+    # 列出全部需 LLM 处理的槽位
     if args.polish and prompts:
         slot_ids = ", ".join(p["shot_id"] for p in prompts)
         print(f"[build_prompts] 全部槽位 ({slot_ids}) 已列入润色清单")

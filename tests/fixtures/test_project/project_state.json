@@ -1,0 +1,27 @@
+{
+  "project_id": "test_dark_clinic",
+  "current_step": "M4",
+  "status": "in_progress",
+  "concept": {
+    "fields": {
+      "name": "Dark Clinic: Eastern Medicine Horror",
+      "main_character": "Lin Xiaotang (young female doctor)",
+      "characters": ["Lin Xiaotang", "Old Doctor Gu", "Possessed Patient"],
+      "key_scene": "an ancient Chinese medicine hall shrouded in darkness and incense",
+      "theme_keywords": ["eastern horror", "yin-yang medicine", "dark folklore"],
+      "enemies": ["Possessed Patients", "Evil Spirits"],
+      "boss_description": "The Crimson Thread Demon — a giant humanoid wrapped in blood-soaked acupuncture threads",
+      "landmark_scene": "The Crimson Herb Garden — glowing medicinal plants under a blood moon",
+      "featured_character": "Lin Xiaotang holding a glowing acupuncture needle",
+      "color_preference": "dark base with crimson red and warm herbal amber accents"
+    },
+    "shotlist": [
+      {"id": "S1", "name": "主视觉 KV", "purpose": "Store page main visual, dark Chinese medicine horror", "visual_keywords": ["eastern horror", "acupuncture", "dark folklore"], "render_mode": "concept_allowed", "reference_assets": []},
+      {"id": "S2", "name": "标志性场景图", "purpose": "Establish the crimson herb garden world", "visual_keywords": ["herb garden", "blood moon", "glowing plants"], "render_mode": "concept_allowed", "reference_assets": []},
+      {"id": "S3", "name": "主界面", "purpose": "Main menu showing the clinic hall", "visual_keywords": ["clinic hall", "dark UI", "incense"], "render_mode": "mobile_screenshot", "reference_assets": []},
+      {"id": "S4", "name": "战斗 / 核心玩法画面", "purpose": "Treatment-based combat against possessed patient", "visual_keywords": ["acupuncture combat", "meridian lines", "treatment"], "render_mode": "mobile_screenshot", "reference_assets": []},
+      {"id": "S5", "name": "Boss战 / 高潮场景", "purpose": "Crimson Thread Demon boss fight climax", "visual_keywords": ["crimson thread", "giant boss", "acupuncture storm"], "render_mode": "mobile_screenshot", "reference_assets": []},
+      {"id": "S6", "name": "角色养成 / 成长系统", "purpose": "Herb formula upgrade and meridian skill tree", "visual_keywords": ["herb mixing", "meridian tree", "upgrade"], "render_mode": "mobile_screenshot", "reference_assets": []}
+    ]
+  }
+}

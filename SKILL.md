@@ -5,13 +5,20 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 
 # 工具定位
 
-> **v0.8.2** · 2026-05-26
+> **v0.8.3** · 2026-05-26
 
 ## Changelog
+
+### v0.8.3 (2026-05-26)
+- **vendor/modern-minimal-html**：将 modern-minimal-html SKILL.md 打包进仓库 `vendor/` 目录，确保其他人 clone 后无需单独安装
+- **check_design_backend.py**：新增 vendor fallback 逻辑——优先使用系统全局安装的 modern-minimal-html，找不到时自动从仓库 `vendor/` 加载
+- **m7-html-generation.md**：Pitfall 4 "Shot card 排版失衡" 排查指南
 
 ### v0.8.2 (2026-05-26)
 - **Shot card 排版**：关联 modern-minimal-html 组件 19 更新，横版图(16:9)用 `.shot-img-wide` 400px，竖版图(9:16)用 `.shot-img` 280px，根据 ASPECT RATIO 自动区分
 - **m7-html-generation.md**：Pitfall 4 新增 "Shot card 排版失衡" 排查指南，占位框区分横竖版尺寸
+- **hybrid-category-mapping.md**：新增实例二「RPG养成+地府探索」+ M5 修正流程（通用），覆盖杂交品类 ART STYLE 全量替换、S7-S9 槽位名修正、验证清单
+- **chinese-folklore-minigame-landscape.md**：新增「Q版微恐方向」章节，귀판오분전 案例 + 平台合规注意事项
 - **build_html_brief.py**：传递 aspect_ratio 到 design brief，确保 HTML 生成时正确选类
 
 ### v0.8.1 (2026-05-26)

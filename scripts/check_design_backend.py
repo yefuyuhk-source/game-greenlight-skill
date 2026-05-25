@@ -18,6 +18,9 @@ DEFAULT_SKILL_ROOTS = [
     Path.home() / ".agents" / "skills",
 ]
 
+# 仓库自带的 vendor 目录（兜底：系统未安装 modern-minimal-html 时使用）
+_VENDOR_ROOT = Path(__file__).resolve().parent.parent / "vendor"
+
 
 def find_modern_minimal(extra_roots: list[Path] | None = None) -> Path | None:
     roots = [*DEFAULT_SKILL_ROOTS, *(extra_roots or [])]
@@ -25,6 +28,10 @@ def find_modern_minimal(extra_roots: list[Path] | None = None) -> Path | None:
         candidate = root / "modern-minimal-html" / "SKILL.md"
         if candidate.exists():
             return candidate
+    # Fallback: 仓库自带的 vendor 版本
+    vendor_candidate = _VENDOR_ROOT / "modern-minimal-html" / "SKILL.md"
+    if vendor_candidate.exists():
+        return vendor_candidate
     return None
 
 

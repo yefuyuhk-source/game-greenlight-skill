@@ -64,6 +64,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
      python scripts/gen_image.py --prompts <project>/images/prompts.jsonl --provider toapis --output-dir <project>/images --category <品类名>
      ```
      出图时优先使用 `prompt_v2`（如有），否则用 `prompt_v1`
+     - Gemini 3.1 Flash 出图：将 `--provider toapis` 替换为 `--provider toapis31`
    - 对话中返回 `images/prompts.jsonl` 与 `project_state.json` 的路径
 6. M6 演示视频分镜：默认只生成 `video/storyboard.md`。
 7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 输出先检测设计后端（`modern-minimal-html`），有则调用它定制排版，没有时使用内置结构化卡片式 HTML 兜底（`scripts/md_to_html.py`）。
@@ -97,7 +98,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 - HTML 兜底转换：`scripts/md_to_html.py`（无 modern-minimal-html 时使用，输出现代极简风结构化卡片布局）
 - 产物路径：`scripts/list_outputs.py`
 - 资产索引：`scripts/asset_index.py`
-- 可选出图：`scripts/gen_image.py` — 支持 `--provider toapis`（Gemini 2.5 Flash）或 `--provider banana`
+- 可选出图：`scripts/gen_image.py` — 支持 `--provider toapis`（Gemini 2.5 Flash）、`--provider toapis31`（Gemini 3.1 Flash）或 `--provider banana`
 - 可选视频：`scripts/gen_video_seedance.py`、`scripts/ffmpeg_concat.py`
 
 # 失败与降级

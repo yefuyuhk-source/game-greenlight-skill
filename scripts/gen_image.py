@@ -4,9 +4,12 @@
 支持从品类 YAML 读取 model_route 参数。
 
 支持的 provider:
-- toapis: 调用 ToAPIs Gemini 2.5 Flash Image API（异步任务，自动轮询）
-- banana: 调用 Banana.dev serverless GPU API（Stable Diffusion）
+- toapis:   调用 ToAPIs Gemini 2.5 Flash Image API（异步任务，自动轮询，默认）
+- toapis31: 调用 ToAPIs Gemini 3.1 Flash Image API（异步任务，自动轮询）
+- banana:   调用 Banana.dev serverless GPU API（Stable Diffusion）
 - 未配置时降级为仅生成提示词
+
+可通过 --toapis-model 或 TOAPIS_MODEL 环境变量指定模型名。
 """
 
 from __future__ import annotations
@@ -158,11 +161,14 @@ def resolve_size(render_mode: str) -> str:
         return "9:16"
 
 
-def run_toapis(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
+def run_toapis(prompts_path: Path, output_dir: Path, model: str = "") -> tuple[list[dict], int]:
     """运行 ToAPIs provider，返回 (更新后的 prompts, 成功张数)。"""
     api_key = os.environ.get("TOAPIS_API_KEY")
     if not api_key:
         raise SystemExit("缺少 TOAPIS_API_KEY 环境变量")
+
+    # 模型名优先级：参数 > 环境变量 > 默认
+    model = model or os.environ.get("TOAPIS_MODEL") or "gemini-2.5-flash-image-preview"
 
     prompts = load_prompts(prompts_path)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -181,8 +187,8 @@ def run_toapis(prompts_path: Path, output_dir: Path) -> tuple[list[dict], int]:
             print(f"[toapis] {shot_id} «{name}» 提示词为空，跳过", file=sys.stderr)
             continue
 
-        print(f"[toapis] 提交 {shot_id} «{name}» (size={size}) ...")
-        task = toapis_submit(api_key, prompt, size=size)
+        print(f"[toapis] 提交 {shot_id} «{name}» (model={model}, size={size}) ...")
+        task = toapis_submit(api_key, prompt, size=size, model=model)
         if task is None:
             print(f"[toapis] {shot_id} 提交失败，跳过", file=sys.stderr)
             continue
@@ -368,6 +374,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="图像 provider 入口")
     parser.add_argument("--prompts", required=True, help="images/prompts.jsonl")
     parser.add_argument("--provider", default=os.environ.get("IMAGE_PROVIDER"))
+    parser.add_argument("--toapis-model", default=None,
+                        help="ToAPIs 模型名，缺省根据 provider 自动选择")
     parser.add_argument("--output-dir", default=None)
     parser.add_argument("--category", default=None,
                         help="品类名，从 category_prompts.yaml 读取 model_route 参数")
@@ -415,13 +423,37 @@ def main() -> None:
         )
         return
 
+    # 解析 toapis 模型
+    toapis_model = args.toapis_model
+
     if args.provider == "toapis":
-        updated, success = run_toapis(prompts_path, output_dir)
+        updated, success = run_toapis(prompts_path, output_dir, model=toapis_model)
         print(
             json.dumps(
                 {
                     "ok": True,
                     "provider": "toapis",
+                    "total": len(updated),
+                    "success": success,
+                    "output_dir": str(output_dir),
+                    "time": now_iso(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return
+
+    if args.provider == "toapis31":
+        # 缺省使用 gemini-3.1-flash-image-preview，--toapis-model 可覆盖
+        updated, success = run_toapis(prompts_path, output_dir,
+                                       model=toapis_model or "gemini-3.1-flash-image-preview")
+        print(
+            json.dumps(
+                {
+                    "ok": True,
+                    "provider": "toapis31",
+                    "model": toapis_model or "gemini-3.1-flash-image-preview",
                     "total": len(updated),
                     "success": success,
                     "output_dir": str(output_dir),
@@ -453,7 +485,7 @@ def main() -> None:
 
     raise SystemExit(
         f"provider '{args.provider}' 尚未安装 adapter。"
-        f"支持的 provider: toapis, banana"
+        f"支持的 provider: toapis, toapis31, banana"
     )
 
 

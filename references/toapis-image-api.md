@@ -1,5 +1,14 @@
 # ToAPIs Gemini 图像生成 API 参考
 
+## 支持模型
+
+| Provider alias | 模型名 | 说明 |
+|----------------|--------|------|
+| `toapis` | `gemini-2.5-flash-image-preview` | Gemini 2.5 Flash（稳定版） |
+| `toapis31` | `gemini-3.1-flash-image-preview` | Gemini 3.1 Flash（新） |
+
+可通过 `--toapis-model` 或 `TOAPIS_MODEL` 环境变量指定任意模型名。
+
 ## 端点
 
 | 操作 | 方法 | URL |

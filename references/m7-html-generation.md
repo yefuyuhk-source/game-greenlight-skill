@@ -26,8 +26,9 @@ python scripts/build_html_brief.py /path/to/project --output /path/to/project/re
 
 **关键约束**：
 - 标题只写项目名称（如"小妖的洞天"），不加"游戏立项方向内部讨论报告"后缀
-- 使用 modern-minimal-html 的 CSS 变量体系和 18 种组件模块
+- 使用 modern-minimal-html 的 CSS 变量体系和 19 种组件模块
 - 白底、0.5px 细边框、无阴影、高密度排版
+- **Shot card 排版**：竖版图(9:16)用 `.shot-img` 280px，横版图(16:9)用 `.shot-img-wide` 400px，根据 prompts.jsonl 的 aspect_ratio 自动区分
 - 所有关键画面均为占位时，展示清晰占位框 + 完整提示词 + 复制按钮
 - HTML 内联 CSS/JS，不依赖外部资源
 - 表格优先，不做无意义图表
@@ -62,7 +63,7 @@ modern-minimal-html 是单一风格体系（白底 + 细框 + 高密度），通
 
 ## 组件选用指南
 
-modern-minimal-html 提供 18 种组件，立项报告常用：
+modern-minimal-html 提供 19 种组件，立项报告常用：
 
 | 组件 | 编号 | 用途 |
 |------|------|------|
@@ -76,6 +77,7 @@ modern-minimal-html 提供 18 种组件，立项报告常用：
 | 风险矩阵 | 9 | 注意事项、待验证假设 |
 | 流程弧 | 4 | 核心玩法循环 |
 | 双列卡片 | 6 | 并列对比内容 |
+| **图片+提示词卡片** | **19** | **关键画面展示，横竖版自适应** |
 
 ## Pitfalls
 
@@ -96,12 +98,25 @@ HTML 首屏主标题只保留项目名称，不加后缀。
 ### 3. 关键画面无生成图
 
 所有 `generated_image` 为 `null` 时：
-- 每张画面展示占位框 + "图片待生成"文字
+- 竖版图 (9:16) 用 `.shot-placeholder`（280×180px）
+- 横版图 (16:9) 用 `.shot-placeholder-wide`（400×225px）
 - 下方展示完整提示词
 - 提示词区域带"复制"按钮，支持一键复制到剪贴板
 - 不要编造图片
 
-### 4. 同步多环境 Skill
+### 4. Shot card 排版失衡
+
+**现象**：手动补图或自动生图后，HTML 报告中的图片+提示词卡片排版不协调——图片过小、左右不对称、横竖版混合时高度参差。
+
+**原因**：旧版 shot card CSS 图片区固定 200px，未区分横竖版。
+
+**解决**：
+- 竖版图 (9:16, mobile_screenshot) → `.shot-img`（280px）
+- 横版图 (16:9, concept_allowed) → `.shot-img-wide`（400px）
+- 根据 `prompts.jsonl` 中 `ASPECT RATIO: 16:9` 标记自动判断
+- 重新生成 HTML 时检查 modern-minimal-html skill 组件 19 是否已更新到最新版
+
+### 5. 同步多环境 Skill
 
 更新 game-greenlight 时，需同步到：
 - Hermes: `~/.hermes/skills/game-greenlight/`

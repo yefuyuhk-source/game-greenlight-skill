@@ -5,9 +5,17 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 
 # 工具定位
 
-> **v0.8.0** · 2026-05-26
+> **v0.8.2** · 2026-05-26
 
 ## Changelog
+
+### v0.8.2 (2026-05-26)
+- **Shot card 排版**：关联 modern-minimal-html 组件 19 更新，横版图(16:9)用 `.shot-img-wide` 400px，竖版图(9:16)用 `.shot-img` 280px，根据 ASPECT RATIO 自动区分
+- **m7-html-generation.md**：Pitfall 4 新增 "Shot card 排版失衡" 排查指南，占位框区分横竖版尺寸
+- **build_html_brief.py**：传递 aspect_ratio 到 design brief，确保 HTML 生成时正确选类
+
+### v0.8.1 (2026-05-26)
+- **M7 补图流程**：用户手动补充生成图片后，需更新 report.html 中 shot card 的占位框为 `<img src="../images/sN.png">`，见本步末尾新增的补图说明
 
 ### v0.8.0 (2026-05-26)
 - **新增品类**：`RPG养成` 加入 category_prompts.yaml（第14个品类），含装备/技能系统、关卡/副本选择、角色属性面板三张替换槽位
@@ -91,6 +99,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
    - **立项报告（Markdown）**：`~/game-greenlight-workspace/outputs/xxx/report/report.md`
    - **立项报告（HTML）**：`~/game-greenlight-workspace/outputs/xxx/report/report.html`
    对话回复中保留所有最终产物的绝对路径，供用户直接打开。
+   - **🖼️ M7 后补图**：如果用户在 M7 完成后手动将生成图片放入 `images/` 目录（如 `s1.png` ~ `s9.png`），需更新 `report.html` 中 shot card 的占位框为真实 `<img>` 标签。图片路径相对于 HTML 为 `../images/sN.png`。同时提示词卡片和 📋 Copy 按钮保持不变。
 9. M8 风格迭代：只在用户对 M5 不满意时进入。
 
 # 判断标签

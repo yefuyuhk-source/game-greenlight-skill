@@ -58,6 +58,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
      - 负向提示词（negative）仍由 build_prompts.py 三层累加生成，不受影响
    - 默认目标是"手游实际画面截图"...
    - 只有主视觉、宣传图、纯氛围场景（`with_ui: false`）允许使用概念图表达
+   - **手工写/润色高表现力提示词时**：见 `references/structured-prompt-composition.md`（4-Layer 结构法：Header → Scene Blocks → Detail Fill → MOOD）
    - 用户显式说"开始出图"或配置 `TOAPIS_API_KEY` 后调用：
      ```
      python scripts/gen_image.py --prompts <project>/images/prompts.jsonl --provider toapis --output-dir <project>/images --category <品类名>

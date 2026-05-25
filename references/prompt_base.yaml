@@ -65,6 +65,12 @@ variable_schema:
   featured_character: "从 project_state.concept.fields.featured_character 读取，缺省时取 main_character"
   color_preference: "从 project_state.concept.fields.color_preference 读取，作为色调强化"
 
+# ------- concept-prompt-architecture 系列上下文（context-only 模式） -------
+concept_prompt_architecture_series_context: |
+  This is shot {shot_index} of {total_shots} concept images for {game_name}.
+  Share 1-2 visual anchor elements with other shots in the series
+  (e.g., a distinctive visual motif, color accent, or recurring symbol).
+
 # ------- 世界观锚点注入说明 -------
 world_anchor_note: |
   所有提示词以 world_context.template 作为第一条碎片注入，

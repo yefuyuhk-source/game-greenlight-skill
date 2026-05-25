@@ -51,12 +51,13 @@
 
 ## M5 关键画面提示词
 
-1. 运行 `python scripts/build_prompts.py --project <project_dir> --category <品类名>`
-   自动完成：三层 YAML 组装 → 生成 `images/prompts.jsonl`（含 prompt_v1 结构化拼接）。
-   **主题一致性**：所有提示词以 `prompt_base.yaml` 的 `world_context.template` 为锚点开头，
-   保证 S1-S10 统一在本项目世界观下，不会脱节或主题错乱。
-2. 加 `--polish` 参数会输出**全部提示词**的润色清单，由 AI 助手在会话中逐条润色并写入 `prompt_v2`。
-   无需外部 API key，直接用当前大模型完成润色（S1/S2/S5 标 ⭐ 精细润色）。
+1. 推荐路径：运行 `python scripts/build_prompts.py --project <project_dir> --category <品类名> --context-only`
+   自动完成：三层 YAML 加载 → 为每条 shot 生成结构化上下文卡片 → 输出 `images/prompts.jsonl`
+   （`prompt_v1` = 上下文卡片，metadata + negative 照常生成）。
+   然后调用 `concept-prompt-architecture` skill 逐条生成英文 prompt 写入 `prompt_v2`。
+   **主题一致性**：上下文卡片包含 world_context anchor，concept-prompt-architecture 的自检第 7 条强化跨 shot 视觉锚点共享。
+2. 兼容路径：`python scripts/build_prompts.py --project <project_dir> --category <品类名> --legacy`
+   使用原有碎片拼接生成 prompt_v1，保持完全向后兼容。
 3. 默认目标是"手游实际画面截图"，用于验证玩法、UI、战斗可读性和项目可行性。
 4. 只有主视觉、宣传图、纯氛围场景（`with_ui: false`）允许使用概念图 / key visual / scene concept 表达。
 5. 用户显式说"开始出图"或配置 `TOAPIS_API_KEY` 后调用：

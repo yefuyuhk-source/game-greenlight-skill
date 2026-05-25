@@ -25,18 +25,24 @@ last_updated: "2026-05-23"
     - id: "S7"
       name: "多角色合影 KV"
       with_ui: false
+      zone_strategy: "营销引流"
+      aspect_ratio: "16:9"
       composition: "group portrait with diverse characters standing together, faction or team alignment visible through poses and spacing, dynamic energy"
       subject_template: "{main_character} alongside {characters} in {key_scene}, {atmosphere_keyword} mood, faction-themed grouping"
 
     - id: "S8"
       name: "角色三视图"
       with_ui: true
+      zone_strategy: "收集欲望"
+      aspect_ratio: "9:16"
       composition: "character showcase with front/side/back views, attribute panel on the side with stats and star rating"
       subject_template: "{main_character} character model viewer in {game_name}, front/side/back views with attributes and level display, {atmosphere_keyword} theme"
 
     - id: "S9"
       name: "抽卡界面"
       with_ui: true
+      zone_strategy: "收集欲望"
+      aspect_ratio: "9:16"
       composition: "gacha reveal screen with summoning animation effects, character card emerging from light, particle effects"
       subject_template: "{game_name} gacha summon screen, {featured_character} SSR card reveal with particle effects and golden light, pull history and rate info on side"
 
@@ -58,18 +64,24 @@ SLG策略战争:
     - id: "S7"
       name: "世界大地图"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "hex or tile-based world map overview, resource nodes, territory markers, marching army lines"
       subject_template: "{game_name} world map, tile-based territory with faction borders, resource nodes and army movement lines, strategic overview"
 
     - id: "S8"
       name: "联盟/外交界面"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "alliance diplomacy screen with member list, technology tree tabs, war declaration status"
       subject_template: "{game_name} alliance screen, member roster with contribution scores, technology research tree, diplomatic relations status"
 
     - id: "S9"
       name: "城建俯瞰图"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "isometric base layout with building levels, resource production indicators, upgrade availability"
       subject_template: "{game_name} city construction view, isometric base with leveled buildings, resource output indicators, upgrade-ready highlights"
 
@@ -91,18 +103,24 @@ MMORPG:
     - id: "S7"
       name: "主城/枢纽"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "crowded city hub with NPCs, players, portals, quest boards, trading stalls"
       subject_template: "{game_name} main city hub, {key_scene} with players and NPCs around, auction house and quest board visible, lively fantasy marketplace"
 
     - id: "S8"
       name: "世界观全景"
       with_ui: false
+      zone_strategy: "世界观展示"
+      aspect_ratio: "16:9"
       composition: "wide panorama of a signature world location, epic landscape, showing the scale of the game world"
       subject_template: "{landmark_scene} world panorama in {game_name}, {atmosphere_keyword} atmosphere, epic fantasy landscape showing distant landmarks"
 
     - id: "S9"
       name: "组队副本"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "party dungeon entrance or ready screen, class roles displayed, party UI with health bars, ready check"
       subject_template: "{game_name} party dungeon, {enemy_type} boss encounter, party frames showing tank/healer/dps roles, ready check in progress"
 
@@ -124,18 +142,24 @@ MMORPG:
     - id: "S7"
       name: "棋盘对局俯视"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "top-down board view with unit pieces on grid, faction auras, synergy effects, health bars"
       subject_template: "{game_name} auto-chess board, units positioned on grid with faction synergy highlights, health bars above pieces, round indicator"
 
     - id: "S8"
       name: "英雄/装备池"
       with_ui: true
+      zone_strategy: "收集欲望"
+      aspect_ratio: "9:16"
       composition: "hero pool or equipment collection with star ratings, costs, synergy tags, refresh button"
       subject_template: "{game_name} hero roster, unit gallery with star ratings and faction tags, cost filters, upgrade materials display"
 
     - id: "S9"
       name: "回合结算"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "round result screen with damage statistics, rank changes, MVP unit highlight"
       subject_template: "{game_name} round result, damage dealt chart, unit MVP highlight, rank position change, gold earned summary"
 
@@ -157,18 +181,24 @@ MMORPG:
     - id: "S7"
       name: "卡组构筑"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "deck building interface, card list with mana curve chart, class filters, deck count"
       subject_template: "{game_name} deck building screen, card collection with mana curve visualization, class and rarity filters, deck count 30/30"
 
     - id: "S8"
       name: "对局打牌"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "card game in play, hand at bottom, board with minions, mana crystals, turn indicator, end turn button"
       subject_template: "{game_name} card game in progress, hand displayed at bottom, mana crystals full, opponent's turn indicator, minion battle on board"
 
     - id: "S9"
       name: "卡牌图鉴"
       with_ui: true
+      zone_strategy: "收集欲望"
+      aspect_ratio: "9:16"
       composition: "card collection gallery, grid of card backs or fronts, rarity filters, collection progress bar"
       subject_template: "{game_name} card collection, grid layout with owned and missing cards, rarity color coding, set completion progress, search bar"
 
@@ -190,18 +220,24 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "地图节点选择"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "node-based progression map with branching paths, event/battle/treasure/shop nodes, current position highlighted"
       subject_template: "{game_name} roguelike map, node-based path with branches, elite and treasure room markers, current floor indicator"
 
     - id: "S8"
       name: "Build 界面"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "ability or relic selection screen, current build combo preview, stats display, upgrade options"
       subject_template: "{game_name} build screen, equipped relics and abilities display, synergy bonuses highlighted, stat modifiers visible, upgrade choice offered"
 
     - id: "S9"
       name: "单局成型截图"
       with_ui: true
+      zone_strategy: "高潮爽感"
+      aspect_ratio: "9:16"
       composition: "late-run gameplay screenshot showing powerful build in action, multiple effects, high enemy density"
       subject_template: "{game_name} late run combat, powerful build with multiple effects active, high enemy density, combo counter, health critical"
 
@@ -223,18 +259,24 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "标志性场景全景"
       with_ui: false
+      zone_strategy: "世界观展示"
+      aspect_ratio: "16:9"
       composition: "wide landscape shot of a signature location, no UI, cinematic environmental view"
       subject_template: "{landmark_scene} in {game_name}, {atmosphere_keyword} atmosphere, wide panoramic view showing the scale and beauty of the world"
 
     - id: "S8"
       name: "探索远景"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "character in open field with distant POI markers on compass, exploration UI visible"
       subject_template: "{game_name} exploration view, character approaching a distant landmark, POI markers on compass, stamina and health bars visible"
 
     - id: "S9"
       name: "世界地图"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "world map with POI icons, explored/unexplored areas, teleport waypoints, region names"
       subject_template: "{game_name} world map, regions with explored percentage, teleport waypoints, quest markers, element resonance display"
 
@@ -256,18 +298,24 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "经营全景俯视"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "isometric town or business overview, buildings at different levels, people or customers, resource output indicators"
       subject_template: "{game_name} business overview, isometric view of town with leveled buildings, happy customers, gold and supply income indicators"
 
     - id: "S8"
       name: "装饰/家园"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "decoration or housing customization screen, furniture grid, theme selection, preview mode"
       subject_template: "{game_name} decoration mode, housing area with furniture placement grid, selected item preview, theme filter tabs, budget remaining"
 
     - id: "S9"
       name: "订单/任务"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "order board or task list, customer requests with rewards, progress bars, time limits"
       subject_template: "{game_name} order board, customer requests with required items and reward preview, delivery progress, time remaining on active orders"
 
@@ -289,18 +337,24 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "立绘对话"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "visual novel dialogue screen, character sprite with multiple expressions, text box, choice buttons, name tag"
       subject_template: "{game_name} dialogue scene, {main_character} with {featured_character}, expressive poses, dialogue text box at bottom, branching choice options"
 
     - id: "S8"
       name: "好感度系统"
       with_ui: true
+      zone_strategy: "收集欲望"
+      aspect_ratio: "9:16"
       composition: "affection or relationship screen, character portraits with hearts, affinity progress bars, unlocked events, gift icons"
       subject_template: "{game_name} relationship screen, character affinity levels with heart meter, unlocked memory events, gift giving interface, date invitations"
 
     - id: "S9"
       name: "关键剧情 CG"
       with_ui: false
+      zone_strategy: "世界观展示"
+      aspect_ratio: "16:9"
       composition: "key story CG illustration, emotional climax moment, beautiful lighting, no UI"
       subject_template: "key story CG, {main_character} and {featured_character} in {key_scene}, {atmosphere_keyword} emotional climax, cinematic illustration quality"
 
@@ -322,18 +376,24 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "关卡内核心玩法"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "in-level puzzle gameplay, board with pieces, special power-ups, goal progress, move counter"
       subject_template: "{game_name} puzzle level, matching board with special pieces and power-ups ready, move counter, goal progress bars, score multiplier active"
 
     - id: "S8"
       name: "地图进度"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "level map with nodes, star ratings per level, locked/unlocked paths, event markers"
       subject_template: "{game_name} level map, path with completed and locked levels, star ratings, event nodes with rewards, map decoration reflecting theme"
 
     - id: "S9"
       name: "装扮/家园"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "decoration or customization screen for the player's home/room, furniture placement grid, theme options"
       subject_template: "{game_name} home decoration mode, room with placed furniture and decorations, theme catalog open, currency and level requirements shown"
 
@@ -355,18 +415,24 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "武器特写"
       with_ui: true
+      zone_strategy: "收集欲望"
+      aspect_ratio: "9:16"
       composition: "weapon inspect or armory screen showing weapon model from different angles, stats panel, rarity, attachments"
       subject_template: "{game_name} weapon inspection, {atmosphere_keyword} styled weapon with stat display, rarity glow, attachment slots, damage and fire rate stats"
 
     - id: "S8"
       name: "技能释放瞬间"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "mid-combat ability cast, character in action pose, skill effect particles, damage numbers, cooldown indicator"
       subject_template: "{game_name} ability in action, {main_character} using signature skill, area-of-effect indicator on ground, enemy hit reaction, skill cooldown UI"
 
     - id: "S9"
       name: "地图标志点"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "tactical map or spawn selection screen, POI markers, teammate positions, objective markers"
       subject_template: "{game_name} tactical map, arena layout with capture points, teammate positions, weapon pickups marked, respawn timer shown"
 
@@ -388,18 +454,24 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "基地俯瞰"
       with_ui: true
+      zone_strategy: "主场景展示"
+      aspect_ratio: "9:16"
       composition: "base overview from elevated angle, building layouts, defense perimeter, resource storage, crop plots"
       subject_template: "{game_name} base overview, crafted structures with upgrade levels, defense walls and turrets, resource stockpile, crop farm plots"
 
     - id: "S8"
       name: "夜晚危机"
       with_ui: true
+      zone_strategy: "高潮爽感"
+      aspect_ratio: "9:16"
       composition: "night defense or survival moment, flashlight or torch lighting, enemies approaching from dark, health critical"
       subject_template: "{game_name} night survival, base defenses active, enemies approaching from darkness, character with weapon drawn, health and hunger bars visible"
 
     - id: "S9"
       name: "合成/制作界面"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "crafting menu with recipe tree, material requirements, crafted item preview, crafting button, inventory materials"
       subject_template: "{game_name} crafting interface, recipe tree with unlock progression, required materials listed with owned count, crafted item preview, craft button ready"
 
@@ -421,17 +493,23 @@ RoguelikeRoguelite:
     - id: "S7"
       name: "演奏界面"
       with_ui: true
+      zone_strategy: "玩法展示"
+      aspect_ratio: "9:16"
       composition: "rhythm gameplay with note tracks, tap indicators, combo counter, score, life gauge, song progress"
       subject_template: "{game_name} rhythm gameplay, note tracks with incoming notes, COMBO counter active, PERFECT judgment text, score multiplier, life gauge"
 
     - id: "S8"
       name: "歌曲选择"
       with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
       composition: "song select screen with album covers, difficulty selection, high scores, leaderboard preview"
       subject_template: "{game_name} song select, grid of song albums with difficulty levels, personal high scores, leaderboard snippets, song length and BPM shown"
 
     - id: "S9"
       name: "舞台演出"
       with_ui: false
+      zone_strategy: "世界观展示"
+      aspect_ratio: "16:9"
       composition: "stage performance visual with characters or avatars performing, concert lighting, crowd energy"
       subject_template: "{game_name} stage performance, virtual concert scene with characters dancing, neon stage lights, crowd glow sticks, dynamic holographic effects"

@@ -74,4 +74,33 @@ python scripts/gen_image.py --prompts outputs/my_game/images/prompts.jsonl --pro
 
 ## 版本历史
 
+- v1.1 (2026-05-25)：新增 --context-only 模式，集成 concept-prompt-architecture skill；YAML 槽位新增 zone_strategy / aspect_ratio 字段
 - v1.0 (2026-05-23)：初始发布，三层 YAML + --polish + 模型路由
+
+## 双模式架构
+
+从 v1.1 开始，`build_prompts.py` 支持两种模式：
+
+### context-only 模式（推荐）
+
+```bash
+python scripts/build_prompts.py --project outputs/my_game/ --category 模拟经营 --context-only
+```
+
+不执行碎片拼接。为每条 shot 生成结构化上下文卡片（存入 `prompt_v1`），包含：
+- 游戏世界观信息 + 角色/场景变量
+- 图像类型 + 分区策略映射（对应 concept-prompt-architecture 的 7 种策略）
+- 品类艺术风格、色调、机位（来自 category_prompts.yaml）
+- 槽位构图指导、主体描述、摄像头覆盖（来自 slot_prompts.yaml）
+- must_include / must_exclude / detail_checklist
+- 系列上下文（触发 concept-prompt-architecture 自检第 7 条）
+
+生成后在会话中调用 `concept-prompt-architecture` skill 逐条消费上下文卡片，输出高质量英文 prompt 写入 `prompt_v2`。
+
+### legacy 模式（兼容）
+
+```bash
+python scripts/build_prompts.py --project outputs/my_game/ --category 模拟经营 --legacy
+```
+
+完全等同于 v1.0 行为：碎片拼接 prompt_v1，--polish 输出润色清单。

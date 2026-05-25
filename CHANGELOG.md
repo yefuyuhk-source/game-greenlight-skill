@@ -1,6 +1,40 @@
 # Changelog
 
-## v0.5.1 (2026-05-23)
+## v0.7.0 (2026-05-25)
+
+**M5 集成 concept-prompt-architecture skill + 默认 Gemini 3.1 Flash**
+
+### 新增
+- M5 `--context-only` 模式：生成结构化上下文卡片供 `concept-prompt-architecture` skill 消费
+- `build_prompts.py` 新增 `--context-only` / `--legacy` 参数（`--legacy` 向后兼容原有碎片拼接）
+- `gen_image.py` 新增 `--provider toapis31`（Gemini 3.1 Flash 图像生成）
+- `--toapis-model` CLI 参数 + `TOAPIS_MODEL` 环境变量，支持模型名覆盖
+- 所有 slot 新增 `zone_strategy` 和 `aspect_ratio` 字段，支持 7 种分区策略映射
+- `references/structured-prompt-composition.md` — 4-Layer 手写提示词方法论手册
+
+### 变更
+- 默认出图模型从 `gemini-2.5-flash-image-preview` 改为 `gemini-3.1-flash-image-preview`
+- 回退 2.5 Flash：`--toapis-model gemini-2.5-flash-image-preview`
+- `references/toapis-gemini-image-api.md` 合并到 `references/toapis-image-api.md`
+
+### 文档
+- `references/prompt-assembly-architecture.md` 新增 v1.1 双模式架构说明
+- `references/workflow.md` M5 流程更新为双路径说明
+
+---
+
+## v0.6.0 (2026-05-24)
+
+**新增 12 个本地增强参考文件**
+
+### 新增
+- 12 个本地增强参考文件（品类映射、设计风格、提示词库等）
+- 测试项目夹具 `tests/fixtures/test_project/`
+
+### 改进
+- 品类配置加载支持大小写不敏感模糊匹配
+
+---
 
 **三层提示词系统 + polish 改进 + 主题一致性 + 产物汇总中文标题**
 

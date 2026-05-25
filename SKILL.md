@@ -5,7 +5,21 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 
 # 工具定位
 
-这是一个“方向筛选辅助器”，不是“立项决策器”。它帮助运营和策划从模糊想法收敛到一个值得继续讨论验证的方向，并写清楚“为什么可能成立”和“还要验证什么”。
+> **v0.8.0** · 2026-05-26
+
+## Changelog
+
+### v0.8.0 (2026-05-26)
+- **新增品类**：`RPG养成` 加入 category_prompts.yaml（第14个品类），含装备/技能系统、关卡/副本选择、角色属性面板三张替换槽位
+- **品类映射表**：shot_taxonomy.md 追加 RPG / ARPG（养成向）条目
+- **修复**：category_prompts.yaml 末尾补充换行符
+
+### v0.7.0 (2026-05-25)
+- M5 新增双路径 `--context-only`（推荐）和 `--legacy`
+- gen_image.py 新增 toapis31 provider（Gemini 3.1 Flash）
+- toapis-image-api.md 合并为统一参考
+
+这是一个"方向筛选辅助器"，不是"立项决策器"。它帮助运营和策划从模糊想法收敛到一个值得继续讨论验证的方向，并写清楚“为什么可能成立”和“还要验证什么”。
 
 硬约束：
 
@@ -44,6 +58,8 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
         → 加载三层 YAML 知识库 + project_state 变量 → 为每条 shot 生成结构化上下文卡片
         → `prompt_v1` 字段存储上下文卡片（供 concept-prompt-architecture skill 消费），metadata + negative 照常生成
         → 输出 `images/prompts.jsonl`
+        → **⚠️ 杂交品类注意**：当项目不属于 13 个固定品类时，品类的默认 art style 和替换槽位命名会覆盖项目实际方向。
+          生成后必须按 `references/m5-hybrid-category-fix.md` 修正 ART STYLE、S7-S9 槽位命名和上下文卡片内容，再进入步骤 b。
      b. 调用 `concept-prompt-architecture` skill：
         → 逐条读取 JSONL 中每个 shot 的上下文卡片（prompt_v1）
         → 按 4 层写作法 + 分区策略 + 8 条自检生成高质量英文 prompt
@@ -99,7 +115,6 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 - 资产索引：`scripts/asset_index.py`
 - 可选出图：`scripts/gen_image.py` — 支持 `--provider toapis`（Gemini 2.5 Flash）、`--provider toapis31`（Gemini 3.1 Flash）或 `--provider banana`
   - 模型优先级：`--toapis-model` 参数 > `TOAPIS_MODEL` 环境变量 > provider 默认模型
-  - 新增 provider：在 `main()` 中添加 provider 分支，调用 `run_toapis(prompts_path, output_dir, model=...)` 复用同一异步轮询逻辑
 - 可选视频：`scripts/gen_video_seedance.py`、`scripts/ffmpeg_concat.py`
 
 # 失败与降级
@@ -110,6 +125,18 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 - 禁止绿灯，禁止 8 分以上候选。
 - 报告封面提示“本次未能完成联网调研，结论基于模型已知信息”。
 - 所有关键判断默认标为 🟡 或 🔴。
+
+# 版本更新
+
+此 skill 托管在 `https://github.com/yefuyuhk-source/game-greenlight-skill`，本地作为 git repo 维护。更新流程：
+
+1. **本地有未提交改动时**：先 `git stash` → `git pull origin main` → `git stash pop`（直接 git pull 会报错 abort）
+2. **feature 分支合并到 main**：`git checkout main && git merge origin/<branch> --no-ff` → push
+3. **推送前展示改动**给用户确认后再 `git push origin main`
+4. **同步其他 skill 目录**：`cd ~/.claude/skills/game-greenlight && git pull origin main`
+5. **structured-prompt-composition.md 等参考文件**：如果本地有新增但未跟踪的文件，记得 `git add` 一起提交，不要在多个副本间手动复制
+
+新增 provider（如 gen_image.py 的 `toapis31`）：在 `main()` 中添加 provider 分支，调用 `run_toapis(prompts_path, output_dir, model=...)` 复用同一异步轮询逻辑。模型优先级：`--toapis-model` 参数 > `TOAPIS_MODEL` 环境变量 > provider 默认。
 
 # 暂停 / 回退 / 恢复
 

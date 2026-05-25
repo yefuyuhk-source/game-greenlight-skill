@@ -513,3 +513,42 @@ RoguelikeRoguelite:
       aspect_ratio: "16:9"
       composition: "stage performance visual with characters or avatars performing, concert lighting, crowd energy"
       subject_template: "{game_name} stage performance, virtual concert scene with characters dancing, neon stage lights, crowd glow sticks, dynamic holographic effects"
+
+# ============== 14. RPG / ARPG ==============
+RPG养成:
+  art_style: "stylized game art with painterly or cel-shaded rendering, character-driven visual focus, rich material definition on equipment and weapons, atmospheric lighting with dramatic rim light on characters"
+  default_camera: "third-person or isometric view, medium shot showing character and immediate environment, slight low angle for hero moments"
+  color_palette: "saturated jewel tones with warm/cool contrast, atmospheric color grading per region, metallic accents on equipment, glowing skill effect highlights"
+  ui_aesthetic: "RPG-style UI with ornate borders, parchment-textured or dark semi-transparent panels, skill icon grids with cooldown indicators, quest tracker on side, character portrait with HP/MP bars"
+  model_route:
+    primary: "gemini-2.5-flash-image-preview"
+    fallback: "sdxl-base"
+    cfg_scale: 7.0
+    denoising_strength: 0.7
+  negative_extra: "modern military, sci-fi, photorealistic, anime chibi, abstract art, flat vector, excessive gore"
+  default_subject: "fantasy RPG character in armor with weapons, skill effects active, in a thematic dungeon or open field environment"
+  social_slot_enabled: false
+  replacement_shots:
+    - id: "S7"
+      name: "装备/技能系统"
+      with_ui: true
+      zone_strategy: "收集欲望"
+      aspect_ratio: "9:16"
+      composition: "equipment panel with gear slots, weapon showcase with stats, skill tree or ability wheel with unlockable nodes"
+      subject_template: "{main_character} equipment and skill tree in {game_name}, weapon and armor slots with equipped items, skill tree with branching unlockable nodes, resource costs displayed"
+
+    - id: "S8"
+      name: "关卡/副本选择"
+      with_ui: true
+      zone_strategy: "世界观展示"
+      aspect_ratio: "9:16"
+      composition: "mission or dungeon select screen with region map, difficulty tiers, reward previews, chapter progression"
+      subject_template: "{game_name} quest map or dungeon select, {landmark_scene} region visible with chapter markers, difficulty selection with reward previews, stamina or entry ticket display"
+
+    - id: "S9"
+      name: "角色属性面板"
+      with_ui: true
+      zone_strategy: "功能说明"
+      aspect_ratio: "9:16"
+      composition: "character stat screen with attribute breakdown, level and class display, equipped gear summary, progression milestones"
+      subject_template: "{main_character} character stat panel in {game_name}, detailed attributes with numeric values, level and class/title displayed, equipped gear preview, upgrade available indicators"

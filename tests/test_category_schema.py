@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class CategorySchemaTests(unittest.TestCase):
-    """category_prompts.yaml 13 品类 schema 校验"""
+    """category_prompts.yaml 14 品类 schema 校验"""
 
     @classmethod
     def setUpClass(cls):

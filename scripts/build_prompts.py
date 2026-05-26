@@ -83,7 +83,7 @@ def fill_template(template: str, variables: dict[str, str], fallback: str = "") 
 
     # 检查是否有变量缺失
     missing = [p for p in placeholders if not variables.get(p, "")]
-    if missing and fallback:
+    if len(missing) == len(placeholders) and fallback:
         # 所有占位符都缺失时整体替换为 fallback
         return fallback
 

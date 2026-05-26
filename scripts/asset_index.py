@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -46,7 +47,11 @@ def main() -> None:
     args = parser.parse_args()
     index = Path(args.index).expanduser()
     if args.command == "add":
-        record = json.loads(args.record)
+        try:
+            record = json.loads(args.record)
+        except json.JSONDecodeError as exc:
+            print(f"错误: --record 不是合法 JSON: {exc}", file=sys.stderr)
+            raise SystemExit(1)
         append_jsonl(index, record)
         print(index)
     elif args.command == "list":

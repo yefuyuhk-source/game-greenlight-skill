@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-SKILL_VERSION = "0.3.1"
+SKILL_VERSION = "0.8.5"
 VALID_STEPS = {f"M{i}" for i in range(1, 9)}
 VALID_STATUS = {"in_progress", "paused", "done", "error"}
 

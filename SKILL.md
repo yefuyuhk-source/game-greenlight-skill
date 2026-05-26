@@ -5,9 +5,20 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 
 # 工具定位
 
-> **v0.8.5** · 2026-05-27
+> **v0.8.6** · 2026-05-26
 
 ## Changelog
+
+### v0.8.6 (2026-05-26)
+- **逻辑修正**：`fill_template` 仅在所有占位符缺失时才使用 fallback，修复部分变量有值时被整体替换的 bug
+- **逻辑修正**：`state.py` SKILL_VERSION 从 `0.3.1` 更新为 `0.8.5`
+- **逻辑修正**：`gen_video_seedance.py` 降级判断改用 `args.provider`，使显式传参行为一致
+- **安全修复**：`fetch_url.py` 新增 URL scheme 白名单 + 内网 IP 过滤（防 SSRF）
+- **安全修复**：`gen_image.py` banana provider 异常信息中过滤 API Key 明文
+- **安全修复**：`ffmpeg_concat.py` 路径单引号转义 + 临时文件清理
+- **健壮性**：`build_html_brief.py` 空报告不再 IndexError；`asset_index.py` 非法 JSON 友好提示
+- **维护**：品类数量注释 13→14 全项目同步；CI 增加 Python 3.14 矩阵
+- **测试**：新增 `test_safety_fixes.py`（12 测试），覆盖所有修复点
 
 ### v0.8.5 (2026-05-27)
 - **安全修复**：所有参考文件删除 `export KEY=xxx`/`KEY=sk-xxx` 等含 key 配置示例，改为仅描述「从环境变量读取」
@@ -80,7 +91,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
         → 加载三层 YAML 知识库 + project_state 变量 → 为每条 shot 生成结构化上下文卡片
         → `prompt_v1` 字段存储上下文卡片（供 concept-prompt-architecture skill 消费），metadata + negative 照常生成
         → 输出 `images/prompts.jsonl`
-        → **⚠️ 杂交品类注意**：当项目不属于 13 个固定品类时，品类的默认 art style 和替换槽位命名会覆盖项目实际方向。
+        → **⚠️ 杂交品类注意**：当项目不属于 14 个固定品类时，品类的默认 art style 和替换槽位命名会覆盖项目实际方向。
           生成后必须按 `references/m5-hybrid-category-fix.md` 修正 ART STYLE、S7-S9 槽位命名和上下文卡片内容，再进入步骤 b。
      b. 调用 `concept-prompt-architecture` skill：
         → 逐条读取 JSONL 中每个 shot 的上下文卡片（prompt_v1）

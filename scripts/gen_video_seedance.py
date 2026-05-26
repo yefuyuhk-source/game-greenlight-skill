@@ -30,7 +30,7 @@ def main() -> None:
     if not storyboard.exists():
         raise SystemExit(f"分镜文件不存在: {storyboard}")
 
-    if args.dry_run or not os.environ.get("VIDEO_PROVIDER"):
+    if args.dry_run or not args.provider:
         print(
             json.dumps(
                 {

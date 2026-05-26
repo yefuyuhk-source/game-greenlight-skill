@@ -45,11 +45,11 @@ def build_brief(project_dir: Path) -> str:
     prompts = read_jsonl(project_dir / "images" / "prompts.jsonl")
     inputs = state.get("inputs", {})
     direction = state.get("direction_judgment", {})
-    report_title = (
-        report_md.read_text(encoding="utf-8").splitlines()[0].lstrip("# ").strip()
-        if report_md.exists()
-        else state.get("project_id", project_dir.name)
-    )
+    report_title = state.get("project_id", project_dir.name)
+    if report_md.exists():
+        lines = report_md.read_text(encoding="utf-8").splitlines()
+        if lines:
+            report_title = lines[0].lstrip("# ").strip() or report_title
 
     prompt_rows = []
     for item in prompts:

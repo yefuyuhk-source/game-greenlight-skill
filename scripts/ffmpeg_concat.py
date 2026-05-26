@@ -7,9 +7,15 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import tempfile
 from pathlib import Path
+
+
+def escape_ffmpeg_path(path: Path) -> str:
+    """转义 ffmpeg concat 列表中路径的单引号。"""
+    return str(path.resolve()).replace("'", "'\\''")
 
 
 def main() -> None:
@@ -27,18 +33,23 @@ def main() -> None:
 
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    content = "\n".join(f"file '{item.resolve()}'" for item in inputs) + "\n"
+    content = "\n".join(f"file '{escape_ffmpeg_path(item)}'" for item in inputs) + "\n"
     if args.dry_run:
         print(content)
         return
 
-    with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as handle:
-        handle.write(content)
-        list_file = handle.name
-    subprocess.run(
-        [args.ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", list_file, "-c", "copy", str(output)],
-        check=True,
-    )
+    list_file = None
+    try:
+        with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8") as handle:
+            handle.write(content)
+            list_file = handle.name
+        subprocess.run(
+            [args.ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", list_file, "-c", "copy", str(output)],
+            check=True,
+        )
+    finally:
+        if list_file and os.path.exists(list_file):
+            os.unlink(list_file)
     print(output)
 
 

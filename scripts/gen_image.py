@@ -299,7 +299,11 @@ def banana_generate(api_key: str, model_key: str, prompt: str,
         with urllib.request.urlopen(req, timeout=300) as resp:
             data = json.loads(resp.read().decode("utf-8"))
     except Exception as exc:
-        print(f"[banana] API 调用失败: {exc}", file=sys.stderr)
+        # 安全：屏蔽可能包含的 API Key
+        msg = str(exc)
+        if api_key:
+            msg = msg.replace(api_key, "***")
+        print(f"[banana] API 调用失败: {msg}", file=sys.stderr)
         return None
 
     outputs = data.get("modelOutputs")

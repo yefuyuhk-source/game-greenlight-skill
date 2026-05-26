@@ -1,5 +1,31 @@
 # Changelog
 
+## v0.8.6 (2026-05-26)
+
+**安全加固与健壮性修复（无功能变更）**
+
+### 逻辑修正
+- `build_prompts.py`：`fill_template` 仅在所有占位符都缺失时才使用 fallback，修复部分变量有值时被 fallback 整体替换的 bug
+- `state.py`：`SKILL_VERSION` 从 `0.3.1` 更新为 `0.8.5`，与 SKILL.md 实际版本对齐
+- `gen_video_seedance.py`：降级判断从检查 `os.environ.get("VIDEO_PROVIDER")` 改为检查 `args.provider`，使 `--provider` 显式传参时行为一致
+
+### 安全
+- `fetch_url.py`：新增 URL scheme 白名单（仅允许 http/https）+ 内网 IP 段过滤（127/10/172.16/192.168/169.254），防止 SSRF
+- `gen_image.py`：banana provider 异常信息中过滤 API Key 明文（替换 `apiKey` 值为 `***`）
+- `ffmpeg_concat.py`：concat 列表中文件路径单引号转义，防止特殊文件名破坏格式
+
+### 健壮性
+- `build_html_brief.py`：空 report.md 不再触发 `IndexError`，使用 project_id 兜底标题
+- `asset_index.py`：`--record` 参数 JSON 解析失败时输出友好错误信息而非 traceback
+- `ffmpeg_concat.py`：临时 concat 列表文件在 ffmpeg 执行后清理（`try/finally + os.unlink`）
+
+### 维护
+- 品类数量注释全项目同步：13 → 14（`category_prompts.yaml`、`test_category_schema.py`、`test_build_prompts.py`、`SKILL.md`）
+- CI workflow：Python 版本矩阵 3.12 + 3.14；依赖改为读取 `requirements.txt`
+- 新增 `tests/test_safety_fixes.py`（12 个测试用例），覆盖本次所有修复点
+
+---
+
 ## v0.8.5 (2026-05-27)
 
 **安全修复：API Key 泄露防护**

@@ -154,8 +154,8 @@ class ExtractVariablesTests(unittest.TestCase):
 class CategoryLoadingTests(unittest.TestCase):
     """品类加载与模糊匹配测试"""
 
-    def test_all_13_categories_exist_in_yaml(self):
-        """category_prompts.yaml 包含 13 个品类配置"""
+    def test_all_14_categories_exist_in_yaml(self):
+        """category_prompts.yaml 包含 14 个品类配置"""
         path = ROOT / "references" / "category_prompts.yaml"
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         categories = [k for k in data if k not in ("version", "last_updated")]

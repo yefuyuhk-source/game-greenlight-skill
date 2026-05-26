@@ -5,9 +5,13 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 
 # 工具定位
 
-> **v0.8.3** · 2026-05-26
+> **v0.8.4** · 2026-05-27
 
 ## Changelog
+
+### v0.8.4 (2026-05-27)
+- **测试修复**：品类计数 13→14（v0.8.0 新增「RPG养成」后未同步）、vendor 降级测试适配
+- **CHANGELOG.md**：补全 v0.8.0–v0.8.3 历史记录
 
 ### v0.8.3 (2026-05-26)
 - **vendor/modern-minimal-html**：将 modern-minimal-html SKILL.md 打包进仓库 `vendor/` 目录，确保其他人 clone 后无需单独安装

@@ -1,5 +1,62 @@
 # Changelog
 
+## v0.8.4 (2026-05-27)
+
+**测试同步 v0.8 系列变更**
+
+### 修复
+- 品类计数测试硬编码 13→14（v0.8.0 新增「RPG养成」品类后未同步）
+- vendor 降级测试更新，适配仓库自带 `vendor/modern-minimal-html/` 兜底逻辑
+
+---
+
+## v0.8.3 (2026-05-26)
+
+**vendor fallback + bugfix**
+
+### 新增
+- `check_design_backend.py` vendor fallback 逻辑——优先系统全局安装，找不到时从仓库 `vendor/` 加载
+- `vendor/` 目录打包 modern-minimal-html SKILL.md，clone 后无需额外安装
+
+### 修复
+- M7 Shot card 排版：横竖图自动区分尺寸（16:9 ↔ 9:16）
+
+---
+
+## v0.8.2 (2026-05-26)
+
+**Shot card 排版 + 杂交品类修正**
+
+### 改进
+- Shot card 横版图(16:9)用 `.shot-img-wide` 400px，竖版图(9:16)用 `.shot-img` 280px
+- `hybrid-category-mapping.md` 新增实例二「RPG养成+地府探索」
+- M5 杂交品类完整修正流程（ART STYLE 全量替换、S7-S9 槽位名修正、验证清单）
+- `chinese-folklore-minigame-landscape.md` 新增「Q版微恐方向」章节
+
+---
+
+## v0.8.1 (2026-05-26)
+
+**M7 补图流程**
+
+### 新增
+- M7 后补图说明：用户手动放入图片后更新 report.html 中 shot card 占位框为 `<img>` 标签
+
+---
+
+## v0.8.0 (2026-05-26)
+
+**新增「RPG养成」品类**
+
+### 新增
+- 第 14 个品类 `RPG养成` 加入 `category_prompts.yaml`（装备/技能系统、关卡/副本选择、角色属性面板三张替换槽位）
+- `shot_taxonomy.md` 追加 RPG / ARPG（养成向）条目
+
+### 修复
+- `category_prompts.yaml` 末尾补充换行符
+
+---
+
 ## v0.7.0 (2026-05-25)
 
 **M5 集成 concept-prompt-architecture skill + 默认 Gemini 3.1 Flash**

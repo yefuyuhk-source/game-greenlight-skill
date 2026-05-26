@@ -13,21 +13,13 @@ Tavily API Key 是 M2 联网调研的**必需**条件。无 key 时 `search_web.
 
 **方式 A：环境变量（推荐）**
 ```bash
-export TAVILY_API_KEY="tvly-xxx..."
+# 在 shell profile（.zshrc / .bashrc）中设置即可
+# TAVILY_API_KEY 会被 search_web.py 自动读取
 ```
-可在 shell profile（`.zshrc`/`.bashrc`）中持久化。
+> ⚠️ 不要在终端命令中直接拼接 API Key 明文。脚本已从 `os.environ` 读取。
 
 **方式 B：配置文件**
-Tavily Python SDK 支持读取 `~/.tavily/config.json`：
-```json
-{"api_key": "tvly-xxx..."}
-```
-多个客户端共享 key 时适用，需确认 `tavily` Python 包已安装。
-
-**方式 C：脚本内直接配置**
-```python
-os.environ["TAVILY_API_KEY"] = "tvly-xxx..."
-```
+Tavily Python SDK 支持读取 `~/.tavily/config.json`，结构见 SDK 文档。
 
 ## 验证
 

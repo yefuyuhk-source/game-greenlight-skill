@@ -5,16 +5,18 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 
 # 工具定位
 
-> **v0.8.4** · 2026-05-27
+> **v0.8.5** · 2026-05-27
 
 ## Changelog
+
+### v0.8.5 (2026-05-27)
+- **安全修复**：所有参考文件删除 `export KEY=xxx`/`KEY=sk-xxx` 等含 key 配置示例，改为仅描述「从环境变量读取」
+- **安全修复**：`gen_image.py` / `search_web.py` 异常输出中过滤 Authorization 头（替换 `Bearer {key}` → `Bearer ***`）
+- **SKILL.md**：新增硬约束「禁止打印/回显/命令行传递 API Key」
 
 ### v0.8.4 (2026-05-27)
 - **测试修复**：品类计数 13→14（v0.8.0 新增「RPG养成」后未同步）、vendor 降级测试适配
 - **CHANGELOG.md**：补全 v0.8.0–v0.8.3 历史记录
-
-### v0.8.3 (2026-05-26)
-- **vendor/modern-minimal-html**：将 modern-minimal-html SKILL.md 打包进仓库 `vendor/` 目录，确保其他人 clone 后无需单独安装
 - **check_design_backend.py**：新增 vendor fallback 逻辑——优先使用系统全局安装的 modern-minimal-html，找不到时自动从仓库 `vendor/` 加载
 - **m7-html-generation.md**：Pitfall 4 "Shot card 排版失衡" 排查指南
 
@@ -46,6 +48,7 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 - 制作成本、团队能力、政策风险、商业模式风险不参与 M3 评分，只能作为注意事项。
 - 默认产出是 Markdown / HTML 文件，不做 Web 应用、按钮、画廊或交互组件。
 - 所有项目产出写入 workspace，不写入 Skill 包。
+- **API Key 安全**：禁止打印、回显、或通过命令行参数传递 `TOAPIS_API_KEY`、`TAVILY_API_KEY` 等敏感环境变量值。仅通过 `os.environ` 读取，且异常输出中必须替换 `Bearer {key}` 为 `Bearer ***`。
 
 # 工作区
 

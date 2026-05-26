@@ -121,7 +121,9 @@ def toapis_submit(api_key: str, prompt: str, size: str = "1:1",
         with urllib.request.urlopen(req, timeout=30) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except Exception as exc:
-        print(f"[toapis] 提交失败: {exc}", file=sys.stderr)
+        # 安全：屏蔽 Authorization 头中的 API Key
+        msg = str(exc).replace(f"Bearer {api_key}", "Bearer ***")
+        print(f"[toapis] 提交失败: {msg}", file=sys.stderr)
         return None
 
 
@@ -136,7 +138,9 @@ def toapis_poll(api_key: str, task_id: str) -> dict | None:
         with urllib.request.urlopen(req, timeout=30) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except Exception as exc:
-        print(f"[toapis] 轮询失败: {exc}", file=sys.stderr)
+        # 安全：屏蔽 Authorization 头中的 API Key
+        msg = str(exc).replace(f"Bearer {api_key}", "Bearer ***")
+        print(f"[toapis] 轮询失败: {msg}", file=sys.stderr)
         return None
 
 

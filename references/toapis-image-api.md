@@ -82,8 +82,6 @@ API Key 从 https://toapis.com 控制台获取。
 ## gen_image.py 用法
 
 ```bash
-export TOAPIS_API_KEY=sk-xxx
-
 # Gemini 2.5 Flash（默认）
 python scripts/gen_image.py --prompts images/prompts.jsonl --provider toapis --output-dir images/
 
@@ -96,6 +94,8 @@ python scripts/gen_image.py --prompts images/prompts.jsonl --provider toapis --d
 # 指定模型（覆盖 provider 默认）
 python scripts/gen_image.py --prompts images/prompts.jsonl --provider toapis --toapis-model gemini-3.1-flash-image-preview
 ```
+
+> ⚠️ API Key 通过 `TOAPIS_API_KEY` 环境变量注入。不要在终端命令中直接拼接 API Key 明文，脚本已从 `os.environ` 读取。
 
 ## 尺寸映射规则
 

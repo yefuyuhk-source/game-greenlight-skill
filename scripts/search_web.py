@@ -46,11 +46,13 @@ def tavily_search(query: str, max_results: int) -> dict[str, Any]:
         with urllib.request.urlopen(request, timeout=30) as response:
             data = json.loads(response.read().decode("utf-8"))
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        # 安全：屏蔽 Authorization 头中的 API Key
+        msg = str(exc).replace(f"Bearer {api_key}", "Bearer ***")
         return {
             "query": query,
             "provider": "tavily",
             "degraded": True,
-            "error": str(exc),
+            "error": msg,
             "fetched_at": now_iso(),
             "results": [],
         }

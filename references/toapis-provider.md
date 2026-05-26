@@ -120,8 +120,4 @@ headers = {
 
 ## 环境变量
 
-```
-TOAPIS_API_KEY=sk-xxx
-```
-
-存入 `~/.hermes/.env`。
+API Key 通过 `TOAPIS_API_KEY` 环境变量注入，不要在命令行或代码中拼接明文。

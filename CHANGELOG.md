@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.8.5 (2026-05-27)
+
+**安全修复：API Key 泄露防护**
+
+### 安全
+- 所有参考文件删除 `export KEY=xxx` 等含 key 配置示例，改为仅描述「从环境变量读取」
+- `gen_image.py` / `search_web.py` 异常输出中过滤 Authorization 头（替换 `Bearer {key}` → `Bearer ***`）
+
+### 文档
+- SKILL.md 新增硬约束「禁止打印/回显/命令行传递 API Key」
+
+---
+
 ## v0.8.4 (2026-05-27)
 
 **测试同步 v0.8 系列变更**

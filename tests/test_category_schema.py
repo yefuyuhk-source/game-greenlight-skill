@@ -20,9 +20,9 @@ class CategorySchemaTests(unittest.TestCase):
             if k not in ("version", "last_updated")
         ]
 
-    def test_13_categories_defined(self):
-        """品类数量必须是 13"""
-        self.assertEqual(len(self.categories), 13)
+    def test_14_categories_defined(self):
+        """品类数量必须是 14"""
+        self.assertEqual(len(self.categories), 14)
 
     def test_each_has_required_string_fields(self):
         """每个品类必须有 6 个字符串字段"""

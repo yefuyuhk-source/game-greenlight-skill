@@ -156,8 +156,9 @@ class ScriptTests(unittest.TestCase):
                 env={"HOME": tmp},
             )
             data = json.loads(result.stdout)
-            self.assertEqual(data["backend"], "structured-html")
-            self.assertFalse(data["modern_minimal_available"])
+            self.assertEqual(data["backend"], "modern-minimal-html")
+            self.assertTrue(data["modern_minimal_available"])
+            self.assertIn("vendor", data["skill_path"])
 
     def test_check_design_backend_extra_root(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

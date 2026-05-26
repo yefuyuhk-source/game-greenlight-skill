@@ -159,7 +159,7 @@ class CategoryLoadingTests(unittest.TestCase):
         path = ROOT / "references" / "category_prompts.yaml"
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
         categories = [k for k in data if k not in ("version", "last_updated")]
-        self.assertEqual(len(categories), 13)
+        self.assertEqual(len(categories), 14)
 
     def test_each_category_has_required_fields(self):
         """每个品类必须有 art_style, replacement_shots, model_route, negative_extra"""

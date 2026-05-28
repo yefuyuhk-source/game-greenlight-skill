@@ -5,9 +5,25 @@ description: Internal direction-screening assistant for game ops/designers. Use 
 
 # 工具定位
 
-> **v0.8.6** · 2026-05-26
+> **v0.9.0** · 2026-05-28
 
 ## Changelog
+
+### v0.9.0 (2026-05-28)
+- **M7 决策树重构**：将 HTML 生成的铁律从描述+警告改为强制序列化步骤。agent 必须先运行 `check_design_backend.py --json`、读取结果、按分支执行显式步骤——加载 modern-minimal-html skill → 读取 19 种组件 → 手写 HTML。`md_to_html.py` 仅在分支 B 中自动触发。禁止跳过 skill 加载或自行捏造组件。
+- **vendor 补齐**：`vendor/modern-minimal-html/` 补齐 `references/` 和 `templates/` 目录，支持无 Hermes 安装时的 skill 加载（通过 `read_file('vendor/modern-minimal-html/SKILL.md')` 兜底）
+- **分支 A 增加 vendor 兜底路径**：`skill_view` 失败时从仓库 vendor 读取 SKILL.md
+
+### v0.8.9 (2026-05-27)
+- **m7-html-generation.md**：新增 Pitfall 7「Shot card 生成后必须验证 div 结构」（含 div 平衡验证 + grep 检查清单）和 Pitfall 8「固定品类 art style 并不安全」（即使是 14 个固定品类，默认 art style 也可能与项目实际方向冲突，必须逐条检查）
+
+### v0.8.8 (2026-05-27)
+- **M7 HTML 生成铁律**：`references/m7-html-generation.md` 新增 Pitfall 5「modern-minimal-html 可用时禁止走兜底」。`md_to_html.py` 仅在后端检测返回 `structured-html` 时才使用——检测到 `modern-minimal-html` 时必须读取 `html_design_brief.md` + 调用 modern-minimal-html skill 原生构建，不允许以省事为由走兜底。
+- **M2 Tavily 快速来源**：`references/tavily-setup.md` 新增一键 source 命令，当 key 仅存在于 `~/.tavily/config.json` 时可直接执行
+- **M5 concept.fields 必填清单**：`references/workflow.md` 新增 M5 前置检查表，列出 `concept.fields` 必须填写的 8 个字段（name, name_en, main_character, key_scene, theme_keywords, art_style, world_context, target_audience），缺一则 world_context anchor 断裂
+
+### v0.8.7 (2026-05-27)
+- **M3 受众分析陷阱**：`references/scoring_rubric.md` 新增「受众分析陷阱」章节，禁止将品类惯例受众直接映射到具体方向。品类 × 题材 × 平台三者受众交叉需来自 M2 来源数据，不可凭 stereotype 推断。
 
 ### v0.8.6 (2026-05-26)
 - **逻辑修正**：`fill_template` 仅在所有占位符缺失时才使用 fallback，修复部分变量有值时被整体替换的 bug
@@ -83,7 +99,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 
 1. M1 需求采集与关键词生成：见 `references/workflow.md`。
 2. M2 证据驱动调研：必须遵守 `references/research_protocol.md`。
-3. M3 选题推荐：必须遵守 `references/scoring_rubric.md`。
+3. M3 选题推荐：必须遵守 `references/scoring_rubric.md`。⚠️ 特别注意受众分析陷阱：禁止凭「品类=某性别」做推断，必须以 M2 平台级人口数据交叉验证。
 4. M4 立项初案：生成 `concept.md`，按 `references/shot_taxonomy.md` 槽位规则生成 `shotlist.md`（6 固定核心 + 2~3 品类替换 + 1 可选社交），填写四条 `direction_hypotheses`。
 5. M5 关键画面提示词：
    - **推荐路径**（LLM 原生生成）：
@@ -91,8 +107,11 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
         → 加载三层 YAML 知识库 + project_state 变量 → 为每条 shot 生成结构化上下文卡片
         → `prompt_v1` 字段存储上下文卡片（供 concept-prompt-architecture skill 消费），metadata + negative 照常生成
         → 输出 `images/prompts.jsonl`
-        → **⚠️ 杂交品类注意**：当项目不属于 14 个固定品类时，品类的默认 art style 和替换槽位命名会覆盖项目实际方向。
-          生成后必须按 `references/m5-hybrid-category-fix.md` 修正 ART STYLE、S7-S9 槽位命名和上下文卡片内容，再进入步骤 b。
+   - **⚠️ ART STYLE 覆盖问题（所有品类）**：品类默认 `art_style`/`color_palette`/`ui_aesthetic` 可能完全不符合项目实际美术方向（如 模拟经营 默认 warm/cozy/田园 → 项目需要 dark Q版微恐）。即使是 14 个固定品类之一，也必须检查并用项目实际风格覆盖。流程：生成上下文卡片 → 检查 `ART STYLE`/`COLOR PALETTE`/`UI AESTHETIC` 是否匹配 → 不匹配则全部替换 → 再生成 prompt_v2。详见 `references/m5-hybrid-category-fix.md`（该文档对固定品类同样适用）。
+   - **⚠️ 固定品类 art style 不匹配**：即使项目属于 14 个固定品类之一，若实际美术方向与品类默认风格差异显著
+          （如 模拟经营 默认 warm/cozy/pastel，但项目是 Q版微恐暗黑风），`build_prompts.py --context-only` 生成的
+          ART STYLE / COLOR PALETTE / UI AESTHETIC 仍会被品类默认值覆盖。必须在生成 prompt_v2 时用项目实际风格
+          替换所有三个字段——不要信任品类默认值，始终以 concept.md 和 shotlist.md 中的美术描述为准。
      b. 调用 `concept-prompt-architecture` skill：
         → 逐条读取 JSONL 中每个 shot 的上下文卡片（prompt_v1）
         → 按 4 层写作法 + 分区策略 + 8 条自检生成高质量英文 prompt
@@ -115,7 +134,36 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
     出图时优先使用 `prompt_v2`（如有），否则用 `prompt_v1`。默认使用 **Gemini 3.1 Flash**，如需回退到 2.5 Flash 用 `--toapis-model gemini-2.5-flash-image-preview`。
   - 对话中返回`images/prompts.jsonl` 与 `project_state.json` 的路径
 6. M6 演示视频分镜：默认只生成 `video/storyboard.md`。
-7. M7 内部讨论报告：按 `references/report_template.md` 汇总为一份 Markdown 立项报告；HTML 输出先检测设计后端（`modern-minimal-html`），有则调用它定制排版，没有时使用内置结构化卡片式 HTML 兜底（`scripts/md_to_html.py`）。
+7. **M7 内部讨论报告**：按 `references/report_template.md` 汇总为一份 Markdown 立项报告。HTML 输出走以下强制决策树：
+
+   **Step 1：检测后端**
+   ```bash
+   python scripts/check_design_backend.py --json
+   ```
+   读取输出中的 `backend` 字段。
+
+   **Step 2：按分支执行**
+
+   ┌─ **分支 A**（`backend = "modern-minimal-html"`）：
+   │  1. 加载 modern-minimal-html skill：
+   │     a. 优先：`skill_view('modern-minimal-html')`（Hermes 安装版）
+   │     b. 兜底：`read_file('vendor/modern-minimal-html/SKILL.md')`（仓库自带的 vendor）
+   │     → 读取 19 种组件的 HTML/CSS 模板全文，**禁止跳过**
+   │  2. 生成设计 brief：`python scripts/build_html_brief.py <project_dir> --output <project_dir>/report/html_design_brief.md`
+   │  3. 读取 `html_design_brief.md` 和 `report/report.md`
+   │  4. **手写** `report/report.html`：使用 modern-minimal-html 的 CSS 变量体系 + 19 种组件原生构建，禁止使用 `md_to_html.py`
+   │  5. 更新 project_state.json：`design_style: "modern-minimal"`, `html_method: "modern-minimal-html (high-fidelity)"`
+   │
+   └─ **分支 B**（`backend = "structured-html"`）：
+      1. 运行兜底：`python scripts/md_to_html.py <project_dir>/report/report.md <project_dir>/report/report.html --prompts <project_dir>/images/prompts.jsonl`
+      2. 更新 project_state.json：`design_style: "structured-card"`, `html_method: "md_to_html.py (fallback)"`
+
+   **验证清单**：
+   - [ ] 检查 `report.html` 是否使用了 modern-minimal-html 的 CSS 变量（`--color-text-primary` 等）
+   - [ ] Shot card 的 div 平衡验证（`<div>` 数 == `</div>` 数）
+   - [ ] 竖版图用 `.shot-img`(280px)，横版图用 `.shot-img-wide`(400px)
+   - [ ] 无生成图时用 `.shot-placeholder` 占位框 + 完整提示词 + Copy 按钮
+   - [ ] `m7-html-generation.md` 的 8 条 Pitfall 全部过一遍
 8. **产物汇总**：M7 完成后运行以下命令展示所有最终产物，包含中文标题与路径：
    ```bash
    python scripts/list_outputs.py {workspace}/outputs/{project_id} --step M7 --markdown
@@ -140,7 +188,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 # 脚本调用
 
 - 状态：`scripts/state.py`
-- 搜索：`scripts/search_web.py`
+- 搜索：`scripts/search_web.py`（依赖 `TAVILY_API_KEY` 环境变量。若 key 仅存在于 `~/.tavily/config.json`，用以下命令 source：`export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])")`）
 - 抓取：`scripts/fetch_url.py`
 - HTML 后端检测：`scripts/check_design_backend.py` — 检测 `modern-minimal-html` skill 是否可用
 - HTML 设计 brief：`scripts/build_html_brief.py` — 生成 modern-minimal-html 设计输入
@@ -176,5 +224,6 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 
 - 用户说“暂停”：设置 `status = paused`。
 - 用户说“回到 Mx”：读取状态并从该步骤重跑，提醒后续产出需要刷新。
-- 新会话恢复：输出当前灯号、Top1 候选、下一步建议。**M5 前须确认 `project_state.concept.fields` 已填写完整（name, main_character, key_scene, theme_keywords 等），否则 world_context 世界锚点会丢失主题上下文。**
+- **M5 前须确认 `project_state.concept.fields` 已填写完整**，必须包含以下 8 个字段，缺一则 `world_context` 世界锚点断裂：
+  `name` `name_en` `main_character` `key_scene` `theme_keywords` `art_style` `world_context` `target_audience`
 - 任何步骤失败：写入 `errors[]`，不静默继续。

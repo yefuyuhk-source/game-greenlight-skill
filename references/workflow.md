@@ -23,6 +23,10 @@
 
 ## M2 证据驱动调研
 
+0. **前置检查**：确认 `TAVILY_API_KEY` 可用。
+   - `search_web.py` 仅从 `os.environ.get("TAVILY_API_KEY")` 读取，不自动检测 `~/.tavily/config.json`（详见 `references/tavily-setup.md`）。
+   - 若 key 在 config 文件中：`export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])")`
+   - 无 key 时所有搜索降级返回空结果，触发 `evidence_strength = weak`。
 1. 使用 `scripts/search_web.py` 搜索关键词。
 2. 使用 `scripts/fetch_url.py` 抽取页面正文与元数据。
 3. 写入 `research/sources.jsonl`。

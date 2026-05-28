@@ -18,8 +18,15 @@ Tavily API Key 是 M2 联网调研的**必需**条件。无 key 时 `search_web.
 ```
 > ⚠️ 不要在终端命令中直接拼接 API Key 明文。脚本已从 `os.environ` 读取。
 
-**方式 B：配置文件**
-Tavily Python SDK 支持读取 `~/.tavily/config.json`，结构见 SDK 文档。
+**方式 B：从 config.json 临时导出（常用 workaround）**
+如果 key 存在 `~/.tavily/config.json` 但未设置环境变量，每次搜索前执行：
+```bash
+export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])")
+```
+> 此命令需在每次搜索前 `&&` 串联，因为子 shell 不继承 export。可简写为一行：
+> ```bash
+> export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])") && python3 scripts/search_web.py "query" --json
+> ```
 
 ## 验证
 

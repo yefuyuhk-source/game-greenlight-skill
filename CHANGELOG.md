@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.9.0 (2026-05-28)
+
+**M7 决策树重构 + vendor 补齐**
+
+### 功能变更
+- **M7 HTML 生成重构为强制决策树**：agent 必须先运行 `check_design_backend.py --json`，按分支 A（modern-minimal-html 可用）或分支 B（兜底）执行。分支 A 强制分 5 个显式子步骤：加载 skill → 生成 brief → 手写 HTML → 更新状态 → 验证。禁止跳过 skill 加载或走兜底。
+- **分支 A 增加 vendor 兜底路径**：`skill_view('modern-minimal-html')` 失败时从 `vendor/modern-minimal-html/SKILL.md` 读取
+- **vendor 补齐**：`vendor/modern-minimal-html/` 补充 `references/` 和 `templates/` 目录，克隆即用
+
+### 文档更新
+- **受众分析陷阱**（`references/scoring_rubric.md`）：禁止将品类惯例受众直接映射到具体方向，需 M2 来源数据交叉验证
+- **Tavily 快速来源**（`references/tavily-setup.md`）：新增从 `~/.tavily/config.json` 一键 source 命令
+- **M5 前置检查表**（`references/workflow.md`）：列出 concept.fields 必须填写的 8 个字段
+- **M7 HTML 指南**（`references/m7-html-generation.md`）：新增决策树结构、验证清单、Pitfall 5~8（div 平衡验证、art style 覆盖问题等）
+- **SKILL.md 主文档**：M3/M5/M7 多处增强，状态恢复要求补充为完整的 8 字段检查清单
+
 ## v0.8.6 (2026-05-26)
 
 **安全加固与健壮性修复（无功能变更）**

@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.9.1 (2026-05-30)
+
+**Tavily Keychain 回退 + 安全加固**
+
+### 功能变更
+- **`search_web.py` 新增 `_load_api_key()` Keychain 回退**：读取优先级为 环境变量 → macOS Keychain → 降级。execute_code 沙箱不继承父 shell 环境变量，现在会自动从 Keychain 读取，不再需要 `~/.tavily/config.json` workaround。
+- **移除所有 `~/.tavily/config.json` 引用**：workflow.md、research_protocol.md、tavily-setup.md 全部更新为 Keychain 自动回退文档。
+
+### 安全
+- `search_web.py` 异常输出中过滤 Authorization 头（`Bearer {key}` → `Bearer ***`），防止 key 泄露到日志。
+- SKILL.md 新增 API Key 安全硬约束：禁止打印/回显/命令行传递敏感环境变量。
+
 ## v0.9.0 (2026-05-28)
 
 **M7 决策树重构 + vendor 补齐**
@@ -11,7 +23,7 @@
 
 ### 文档更新
 - **受众分析陷阱**（`references/scoring_rubric.md`）：禁止将品类惯例受众直接映射到具体方向，需 M2 来源数据交叉验证
-- **Tavily 快速来源**（`references/tavily-setup.md`）：新增从 `~/.tavily/config.json` 一键 source 命令
+- **Tavily 快速来源**（`references/tavily-setup.md`）：新增从 `~/.tavily/config.json` 一键 source 命令（v0.9.1 已移除，改用 Keychain 回退）
 - **M5 前置检查表**（`references/workflow.md`）：列出 concept.fields 必须填写的 8 个字段
 - **M7 HTML 指南**（`references/m7-html-generation.md`）：新增决策树结构、验证清单、Pitfall 5~8（div 平衡验证、art style 覆盖问题等）
 - **SKILL.md 主文档**：M3/M5/M7 多处增强，状态恢复要求补充为完整的 8 字段检查清单

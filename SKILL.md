@@ -188,7 +188,7 @@ python scripts/list_outputs.py {workspace}/outputs/{project_id} --step Mx --mark
 # 脚本调用
 
 - 状态：`scripts/state.py`
-- 搜索：`scripts/search_web.py`（依赖 `TAVILY_API_KEY` 环境变量。若 key 仅存在于 `~/.tavily/config.json`，用以下命令 source：`export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])")`）
+- 搜索：`scripts/search_web.py`（按优先级读取 `TAVILY_API_KEY`：环境变量 → macOS Keychain → 降级。execute_code 沙箱中自动回退到 Keychain，无需手动设置）
 - 抓取：`scripts/fetch_url.py`
 - HTML 后端检测：`scripts/check_design_backend.py` — 检测 `modern-minimal-html` skill 是否可用
 - HTML 设计 brief：`scripts/build_html_brief.py` — 生成 modern-minimal-html 设计输入

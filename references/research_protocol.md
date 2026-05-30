@@ -125,12 +125,30 @@
 - 若继续，建议在 demo 阶段优先验证：……
 ```
 
+## 实操注意事项
+
+### 批量搜索模式（推荐）
+
+使用 `execute_code` 可在单次脚本中串行跑多组 `search_web.py`，每轮 5-6 个关键词，比逐个 terminal 调用更高效。注意：
+
+- 每个 `execute_code` 调用中无需手动获取 `TAVILY_API_KEY`——`search_web.py` 内置了 Keychain 回退机制，在 `execute_code` 沙箱中会自动从 macOS Keychain 读取。
+- 收集 JSONL 输出时优先在 Python 内解析 `result["output"]` 后直接 `write_file`，避免依赖 shell 重定向 `>>`（execute_code 中 shell 重定向行为不稳定）
+- 搜索参数用 `--max-results 3`（非 `--limit`）；JSONL 输出用 `--jsonl`
+
+### fetch_url.py 的 JS 页面限制
+
+`fetch_url.py` 基于 HTTP 请求 + BeautifulSoup，对 JS 重度渲染页面（Steam 商店页、腾讯新闻、知乎专栏等）通常只提取到导航/框架文本，正文缺失。遇到以下情况时降级处理：
+
+- 提取文本 < 500 字符且无实质信息 → 仍可写入 sources.jsonl，但 `excerpt` 从 Tavily 搜索摘要中提取，`reliability` 降一档
+- 需要完整正文的关键来源（如行业报告）→ 考虑用 `scrapling-web-fetch` skill（支持现代 JS 页面和微信公众号）
+- 知乎返回 403 属正常反爬 → 直接用搜索摘要，标注"页面受限无法抓取"
+
 ## 降级模式
 
 当搜索或抓取连续失败 3 次以上：
 
 - `direction_judgment.evidence_strength = weak`
-- 报告封面加入“本次未能完成联网调研，结论基于模型已知信息”
+- 报告封面加入"本次未能完成联网调研，结论基于模型已知信息"
 - 所有判断默认打 🟡 或 🔴
 - 禁止绿灯，禁止 8 分以上候选
 - 报告末尾列出人工补充调研问题

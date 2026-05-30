@@ -13,6 +13,7 @@
 
 1. 从用户自然语言中抽取 `theme`、`gameplay`、`art_style`、`background`、`platforms`、`audience`。
 2. 若可用字段少于 2 个，继续追问。
+3. **模拟经营/RPG 等重度设定依赖品类**：即使已有 3+ 字段，若 `background`（具体经营什么/世界观）缺失，应在 M1 末尾追问。这类品类的竞品对标和用户画像高度依赖设定细节，「模拟经营」本身太宽。
 3. 生成四组关键词：
    - `primary_keywords`: 3-5 个，中英文混合。
    - `competitor_keywords`: 3-8 个。
@@ -24,8 +25,8 @@
 ## M2 证据驱动调研
 
 0. **前置检查**：确认 `TAVILY_API_KEY` 可用。
-   - `search_web.py` 仅从 `os.environ.get("TAVILY_API_KEY")` 读取，不自动检测 `~/.tavily/config.json`（详见 `references/tavily-setup.md`）。
-   - 若 key 在 config 文件中：`export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])")`
+   - `search_web.py` 按优先级读取：环境变量 → macOS Keychain → 降级（详见 `references/tavily-setup.md`）。
+   - execute_code 沙箱中会自动从 Keychain 回退，无需手动设置。
    - 无 key 时所有搜索降级返回空结果，触发 `evidence_strength = weak`。
 1. 使用 `scripts/search_web.py` 搜索关键词。
 2. 使用 `scripts/fetch_url.py` 抽取页面正文与元数据。

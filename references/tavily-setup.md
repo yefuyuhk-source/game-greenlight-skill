@@ -11,30 +11,35 @@ Tavily API Key 是 M2 联网调研的**必需**条件。无 key 时 `search_web.
 
 ## 配置方式（按优先级）
 
-**方式 A：环境变量（推荐）**
-```bash
-# 在 shell profile（.zshrc / .bashrc）中设置即可
-# TAVILY_API_KEY 会被 search_web.py 自动读取
-```
-> ⚠️ 不要在终端命令中直接拼接 API Key 明文。脚本已从 `os.environ` 读取。
+`search_web.py` 的 `_load_api_key()` 按以下优先级读取：
 
-**方式 B：从 config.json 临时导出（常用 workaround）**
-如果 key 存在 `~/.tavily/config.json` 但未设置环境变量，每次搜索前执行：
+**优先级 1：`TAVILY_API_KEY` 环境变量**
 ```bash
-export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])")
+# 由 ~/.zshrc 的 hermes() wrapper 从 Keychain 自动加载
+# 或手动设置：export TAVILY_API_KEY=...
 ```
-> 此命令需在每次搜索前 `&&` 串联，因为子 shell 不继承 export。可简写为一行：
-> ```bash
-> export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])") && python3 scripts/search_web.py "query" --json
-> ```
+
+**优先级 2：macOS Keychain（execute_code 沙箱自动回退）**
+```bash
+# execute_code 沙箱不继承父 shell 环境变量
+# search_web.py 内置 Keychain 回退，自动读取：
+security find-generic-password -a $USER -s "hermes:TAVILY_API_KEY" -w
+```
+> 此回退对 `execute_code` 内调用 search_web.py 自动生效，无需手动配置。
+
+**优先级 3：降级**
+```
+未找到 API Key → 返回 degraded=True，无结果
+```
 
 ## 验证
 
 ```bash
-python3 -c "from tavily import TavilyClient; import os; c=TavilyClient(os.environ['TAVILY_API_KEY']); r=c.search('test', max_results=1); print('OK' if r.get('results') else 'FAIL')"
+python3 scripts/search_web.py "test"
+# 输出应包含 "degraded": false 和实际结果
 ```
 
 ## 已知问题
 
-- `search_web.py` 仅从 `os.environ.get("TAVILY_API_KEY")` 读取，不自动检测 `~/.tavily/config.json`
-- 如果 key 在 config 文件中，需要手动 source：`export TAVILY_API_KEY=$(python3 -c "import json; print(json.load(open('$HOME/.tavily/config.json'))['api_key'])" 2>/dev/null)`
+- `execute_code` 沙箱不继承 shell 环境变量（已通过 Keychain 回退解决）
+- 非 macOS 环境需设置 `TAVILY_API_KEY` 环境变量
